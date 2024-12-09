@@ -13,13 +13,14 @@ from tkinter import *
 
 
 class Karte:
-    def __init__(self):
-        self.__
-        self.__
-        self.__
-        self.__
+    def __init__(self, value:int, color:str):
+        self.__value:int = value 
+        self.__color:str = color
+        self.__next = None
 
 class Deck:
     def __init__(self):
-        self.__nextCard
-        self.__
+        self.__head = Karte("head")
+        self.__size:int = 0
+
+    
