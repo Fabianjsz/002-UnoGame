@@ -1,0 +1,13 @@
+Klassen:
+
+class Karte:
+Node mit color value und next
+
+class Deck:
+Stack mit 119 Karten
+
+class Hand:
+linked Liste mit den Spielbaren Karten
+
+class Stapel:
+Stack, auf welchen nur neue values geadded werden können
