@@ -1,8 +1,8 @@
 #-------------------------------------------------------------------------------
-# Name:         File1.py
+# Name:         main.py
 # Purpose:
 #
-# Author:
+# Author:       Fabianjsz
 #
 # Created:      09.12.2024
 # Copyright:    (c)  2024
