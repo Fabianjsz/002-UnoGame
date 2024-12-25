@@ -163,3 +163,5 @@ cython_debug/
 ressources/Spielanleitung-UNO.pdf
 ressources/StackBeispiel.py
 ressources/Textadv-Fabianjsz.py
+.DS_Store
+ressources/.DS_Store
