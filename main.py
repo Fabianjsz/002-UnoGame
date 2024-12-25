@@ -12,9 +12,10 @@ from __future__ import annotations
 from tkinter import *
 
 class Node:
-    def __init__(self, value):
-        self.value = value
-        self.next = None
+    def __init__(self, value:int, color:str):
+        self.value:int = value
+        self.next:Node = None
+        self.color:str = None
 
 class Stack:
 
@@ -68,6 +69,12 @@ class Stack:
         self.head.next = remove.next #!!! changed
         self.size -= 1
         return remove.value
+    
+    """
+    Generate UNO deck of 108 cards
+    """
+    def buildDeck():
+        pass
 
 
 # Driver Code
