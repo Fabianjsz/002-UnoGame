@@ -27,6 +27,7 @@ def shuffleDeck(deck):
 
 unoDeck = buildDeck()
 unoDeck = shuffleDeck(unoDeck)
+discards = []
 print(unoDeck)
 
 """
@@ -35,15 +36,43 @@ Parameters: numCards -> integer
 Return. cardsDrawn -> List
 """
 
-def drawCard(numCards):
+def drawCards(numCards):
     cardsDrawn = []
     for x in range(numCards):
         cardsDrawn.append(unoDeck.pop(0))
     return cardsDrawn
 
-player1 = drawCard(5)
-player2 = drawCard(5)
 
-print(player1, player2)
+def showHand(player, playerHand):
+
+    print("player {}".format(player + 1))
+    print("your Hand")
+    print("---------------")
+    for card in playerHand:
+        print(card)
+    print("")
 
 
+def canPlay(discardCard, playerHand):
+    splitCard = discardCard.split(" ",1) 
+    color = splitCard[0]
+    value = splitCard[1]
+
+
+    
+    return True
+
+
+players = []
+for player in range(2):
+    players.append(drawCards(5))
+print(players)
+
+playerTurn = 0
+playDirection = 1
+playing = True
+discards.append(unoDeck.pop(0))
+
+while playing:
+    showHand(playerTurn,players[playerTurn])
+    print("Card on top of discard pile : {}".format(discards[-1]))
