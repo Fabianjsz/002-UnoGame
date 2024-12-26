@@ -1,13 +1,30 @@
 Klassen:
 
-class Karte:
+class Karte:  -> Check
 Node mit color value und next
 
 class Deck:
-Stack mit 119 Karten
+    Stack mit 119 Karten
 
-class Hand:
+class CPUHand:
+    def ziehen(X):
+        Zieht x Anzahl an Karten aus dem Deck in die Hand
 linked Liste mit den Spielbaren Karten
 
-class Stapel:
+class SpielerHand():
+    def ziehen(X):
+        Zieht x Anzahl an Karten aus dem Deck in die handling
+
+    def spielKarte(Karte):
+        Speil die Karte x, soweit möglich, auf den Stapel aus
+
+class Stack:
 Stack, auf welchen nur neue values geadded werden können
+funtkonen:
+    clearStack():
+        Löscht den Stack
+
+    getValue():
+        return lenght
+
+    
