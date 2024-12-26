@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------
 # Name:         main.py
-# Purpose:
+# Purpose:      main logic for Uno Game in python
 #
 # Author:       Fabianjsz
 #
@@ -10,20 +10,21 @@
 #-------------------------------------------------------------------------------
 from __future__ import annotations
 from tkinter import *
+import random
 
-class Node:
+class Card:
     def __init__(self, value:int, color:str):
+        self.next:Card = None
         self.value:int = value
-        self.next:Node = None
-        self.color:str = None
+        self.color:str = color
 
-class Stack:
+class Deck:
 
     # Initializing a stack.
     # Use a dummy node, which is
     # easier for handling edge cases.
     def __init__(self):
-        self.head = Node("head")
+        self.head = Card("head",None)
         self.size = 0
 
     # String representation of the stack
@@ -54,8 +55,8 @@ class Stack:
         return self.head.next.value
 
     # Push a value into the stack.
-    def push(self, value):
-        node = Node(value)
+    def push(self, value, color):
+        node = Card(value, color)
         node.next = self.head.next # Make the new node point to the current head
         self.head.next = node #!!! # Update the head to be the new node
         self.size += 1
@@ -73,15 +74,46 @@ class Stack:
     """
     Generate UNO deck of 108 cards
     """
-    def buildDeck():
-        pass
+    def buildDeck(): #//TODO #4 Create a Funktion for generating uno Deck
+        deck = []
+        colors = ["Rot", "Gruen", "Gelb", "Blau"]
+        values = [0,1,2,3,4,5,6,7,8,9, "Ziehe Zwei", "Skip", "Reverse"]
+        wilds = ["Wild", "Wild Ziehe Vier"]
+        for color in colors:
+            for value in values:
+                cardVal = "{} {}".format(color, value)
+                deck.append(cardVal)
+                if value != 0:
+                    deck.append(cardVal)
+        for i in range(4):
+            deck.append(wilds[0])
+            deck.append(wilds[1])
+        for cardPos in range(len(deck)):
+            randPos = random.randint(0,107)
+            deck[cardPos], deck[randPos] = deck[randPos], deck[cardPos]
+        return deck            
+
+class stack:
+    def __init__(self):
+        self.head:Card = Card("head", None)
+        self.size:int = 0
+
+class cpuHand: #//TODO #3 Create Class and linked list hand
+    def __init__(self):
+        self.head:Card = Card("head", None)
+
+
+class playerHand: #//TODO #2 Create Class and linked list Hand
+    def __init__(self):
+        self.head:Card = Card("head", None)
+
 
 
 # Driver Code
 if __name__ == "__main__":
-    stack = Stack()
+    stack = Deck()
     for i in range(1, 11):
-        stack.push(i)
+        stack.push(i,"")
     print(f"Stack: {stack}")
 
     for _ in range(1, 6):
@@ -90,12 +122,5 @@ if __name__ == "__main__":
     print(f"Stack: {stack}")
 
 
-
-
-
-class Hand: #//TODO #2 Create Class and linked list Hand
-    def __init__(self):
-        self.__head = Node("head")
-        self.__size:int = 0
-
-
+Karte = Deck
+print(Karte.buildDeck())
