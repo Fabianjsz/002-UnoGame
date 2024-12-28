@@ -27,15 +27,6 @@ class Deck:
         self.head = Card("head",None)
         self.size = 0
 
-    # String representation of the stack
-    def __str__(self):
-        cur = self.head.next
-        out = ""
-        while cur:
-            out += str(cur.value) + "->"
-            cur = cur.next
-        return out[:-2]
-
     # Get the current size of the stack
     def getSize(self):
         return self.size
@@ -51,8 +42,10 @@ class Deck:
         # are peeking an empty stack.
         if self.isEmpty():
             return None
-
-        return self.head.next.value
+        else:
+            temp1 = self.head.next.value
+            temp2 = self.head.next.color
+        return temp1, temp2
 
     # Push a value into the stack.
     def push(self, value, color):
@@ -71,9 +64,7 @@ class Deck:
         self.size -= 1
         return remove.value
     
-    """
-    Generate UNO deck of 108 cards
-    """
+    # Build uno deck of 108 cards
     def buildDeck():
         deck = []
         
@@ -102,10 +93,43 @@ class Deck:
         
         return deck            
 
+def convertDeck():
+    arrayDeck = Deck.buildDeck()
+    unoDeck = Deck()
+
+    for card in arrayDeck:
+        temp = card.split(" ")
+        print(temp)
+        if temp[0] == "Wild" or temp[0] == "Wild Ziehe Vier":
+            unoDeck.push(temp[0], None)
+        else:
+            unoDeck.push(temp[0], temp[1])
+
+
 class stack:
     def __init__(self):
         self.head:Card = Card("head", None)
         self.size:int = 0
+
+    def push(self, value:int, color:str):
+        node = Card(value, color)
+        node.next = self.head.next
+        self.head.next = node
+        self.size += 1
+
+    def peek(self):
+        if self.isEmpty():
+            return None
+        else:
+            temp1 = self.head.next.value
+            temp2 = self.head.next.color
+        return temp1, temp2
+    
+    def clear(self):
+        self.head.next = None
+        self.size = 0
+
+
 
 class cpuHand: #//TODO #3 Create Class and linked list hand
     def __init__(self):
@@ -118,26 +142,6 @@ class playerHand: #//TODO #2 Create Class and linked list Hand
 
 
 
-arrayDeck = Deck.buildDeck()
-print(arrayDeck)
 
 
-unoDeck = Deck()
 
-for card in arrayDeck:
-    temp = card.split(" ")
-    print(temp)
-    if temp[0] == "Wild" or temp[0] == "Wild Ziehe Vier":
-        unoDeck.push(temp[0], None)
-    else:
-        unoDeck.push(temp[0], temp[1])
-
-#Display the stack
-print("Deck in stacked linear list form:")
-print(unoDeck.getSize())
-
-print("\nTop of the stack (peek):", unoDeck.peek())
-print("\nLength of the stack(lenght):", unoDeck.getSize())
-print("Popping the top card:", unoDeck.pop())
-print("length of the stack post pop:", unoDeck.getSize())
-print("Top of the stack after popping:", unoDeck.peek())
