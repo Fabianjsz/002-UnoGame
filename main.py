@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------
 # Name:         main.py
-# Purpose:
+# Purpose:      main logic for Uno Game in python
 #
 # Author:       Fabianjsz
 #
@@ -10,30 +10,22 @@
 #-------------------------------------------------------------------------------
 from __future__ import annotations
 from tkinter import *
+import random
 
-class Node:
+class Card:
     def __init__(self, value:int, color:str):
+        self.next:Card = None
         self.value:int = value
-        self.next:Node = None
-        self.color:str = None
+        self.color:str = color
 
-class Stack:
+class Deck:
 
     # Initializing a stack.
     # Use a dummy node, which is
     # easier for handling edge cases.
     def __init__(self):
-        self.head = Node("head")
+        self.head = Card("head",None)
         self.size = 0
-
-    # String representation of the stack
-    def __str__(self):
-        cur = self.head.next
-        out = ""
-        while cur:
-            out += str(cur.value) + "->"
-            cur = cur.next
-        return out[:-2]
 
     # Get the current size of the stack
     def getSize(self):
@@ -50,12 +42,14 @@ class Stack:
         # are peeking an empty stack.
         if self.isEmpty():
             return None
-
-        return self.head.next.value
+        else:
+            temp1 = self.head.next.value
+            temp2 = self.head.next.color
+        return temp1, temp2
 
     # Push a value into the stack.
-    def push(self, value):
-        node = Node(value)
+    def push(self, value, color):
+        node = Card(value, color)
         node.next = self.head.next # Make the new node point to the current head
         self.head.next = node #!!! # Update the head to be the new node
         self.size += 1
@@ -70,32 +64,84 @@ class Stack:
         self.size -= 1
         return remove.value
     
-    """
-    Generate UNO deck of 108 cards
-    """
+    # Build uno deck of 108 cards
     def buildDeck():
-        pass
+        deck = []
+        
+        #Define the card colors and values
+        colors = ["Rot", "Gruen", "Gelb", "Blau"]
+        values = [0,1,2,3,4,5,6,7,8,9, "Ziehe Zwei", "Skip", "Reverse"]
+        wilds = ["Wild", "Wild Ziehe Vier"]
+
+        #Create the numbered and special cards for each color
+        for color in colors:
+            for value in values:
+                cardVal = "{} {}".format(color, value)
+                deck.append(cardVal)
+                if value != 0:
+                    deck.append(cardVal)
+        
+        #Add the wild cards to the deck
+        for i in range(4):
+            deck.append(wilds[0])
+            deck.append(wilds[1])
+        
+        #Shuffle the deck
+        for cardPos in range(len(deck)):
+            randPos = random.randint(0,107)
+            deck[cardPos], deck[randPos] = deck[randPos], deck[cardPos]
+        
+        return deck            
+
+def convertDeck():
+    arrayDeck = Deck.buildDeck()
+    unoDeck = Deck()
+
+    for card in arrayDeck:
+        temp = card.split(" ")
+        print(temp)
+        if temp[0] == "Wild" or temp[0] == "Wild Ziehe Vier":
+            unoDeck.push(temp[0], None)
+        else:
+            unoDeck.push(temp[0], temp[1])
 
 
-# Driver Code
-if __name__ == "__main__":
-    stack = Stack()
-    for i in range(1, 11):
-        stack.push(i)
-    print(f"Stack: {stack}")
-
-    for _ in range(1, 6):
-        top_value = stack.pop()
-        print(f"Pop: {top_value}") # variable name changed
-    print(f"Stack: {stack}")
-
-
-
-
-
-class Hand: #//TODO #2 Create Class and linked list Hand
+class stack:
     def __init__(self):
-        self.__head = Node("head")
-        self.__size:int = 0
+        self.head:Card = Card("head", None)
+        self.size:int = 0
+
+    def push(self, value:int, color:str):
+        node = Card(value, color)
+        node.next = self.head.next
+        self.head.next = node
+        self.size += 1
+
+    def peek(self):
+        if self.isEmpty():
+            return None
+        else:
+            temp1 = self.head.next.value
+            temp2 = self.head.next.color
+        return temp1, temp2
+    
+    def clear(self):
+        self.head.next = None
+        self.size = 0
+
+
+
+class cpuHand: #// TODO: Create class and linked list cpuHand
+    def __init__(self):
+        self.head:Card = Card("head", None)
+
+
+class playerHand: #//TODO #2 Create Class and linked list Hand
+    def __init__(self):
+        self.head:Card = Card("head", None)
+
+
+
+
 
 
