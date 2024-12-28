@@ -74,23 +74,32 @@ class Deck:
     """
     Generate UNO deck of 108 cards
     """
-    def buildDeck(): #//TODO #4 Create a Funktion for generating uno Deck
+    def buildDeck():
         deck = []
+        
+        #Define the card colors and values
         colors = ["Rot", "Gruen", "Gelb", "Blau"]
         values = [0,1,2,3,4,5,6,7,8,9, "Ziehe Zwei", "Skip", "Reverse"]
         wilds = ["Wild", "Wild Ziehe Vier"]
+
+        #Create the numbered and special cards for each color
         for color in colors:
             for value in values:
                 cardVal = "{} {}".format(color, value)
                 deck.append(cardVal)
                 if value != 0:
                     deck.append(cardVal)
+        
+        #Add the wild cards to the deck
         for i in range(4):
             deck.append(wilds[0])
             deck.append(wilds[1])
+        
+        #Shuffle the deck
         for cardPos in range(len(deck)):
             randPos = random.randint(0,107)
             deck[cardPos], deck[randPos] = deck[randPos], deck[cardPos]
+        
         return deck            
 
 class stack:
@@ -109,18 +118,26 @@ class playerHand: #//TODO #2 Create Class and linked list Hand
 
 
 
-# Driver Code
-if __name__ == "__main__":
-    stack = Deck()
-    for i in range(1, 11):
-        stack.push(i,"")
-    print(f"Stack: {stack}")
-
-    for _ in range(1, 6):
-        top_value = stack.pop()
-        print(f"Pop: {top_value}") # variable name changed
-    print(f"Stack: {stack}")
+arrayDeck = Deck.buildDeck()
+print(arrayDeck)
 
 
-Karte = Deck
-print(Karte.buildDeck())
+unoDeck = Deck()
+
+for card in arrayDeck:
+    temp = card.split(" ")
+    print(temp)
+    if temp[0] == "Wild" or temp[0] == "Wild Ziehe Vier":
+        unoDeck.push(temp[0], None)
+    else:
+        unoDeck.push(temp[0], temp[1])
+
+#Display the stack
+print("Deck in stacked linear list form:")
+print(unoDeck.getSize())
+
+print("\nTop of the stack (peek):", unoDeck.peek())
+print("\nLength of the stack(lenght):", unoDeck.getSize())
+print("Popping the top card:", unoDeck.pop())
+print("length of the stack post pop:", unoDeck.getSize())
+print("Top of the stack after popping:", unoDeck.peek())
