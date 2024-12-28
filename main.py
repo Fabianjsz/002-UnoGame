@@ -135,6 +135,10 @@ class cpuHand: #// TODO: Create class and linked list cpuHand
     def __init__(self):
         self.head:Card = Card("head", None)
 
+    def drawCard(self, deck:Deck, numCards:int):
+        for i in range(numCards):
+            self.addCard(deck.pop())
+
 
 class playerHand: #//TODO #2 Create Class and linked list Hand
     def __init__(self):
