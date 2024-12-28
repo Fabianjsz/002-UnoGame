@@ -131,7 +131,7 @@ class stack:
 
 
 
-class cpuHand: #//TODO #3 Create Class and linked list hand
+class cpuHand: #// TODO: Create class and linked list cpuHand
     def __init__(self):
         self.head:Card = Card("head", None)
 
