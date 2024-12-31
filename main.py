@@ -115,7 +115,7 @@ class stack:
         self.head:Card = Card("head", None)
         self.size:int = 0
 
-    def push(self, value:int, color:str):
+    def addCard(self, value:int, color:str): #//TODO: #3 pop Card from deck/Hand to stack
         node = Card(value, color)
         node.next = self.head.next
         self.head.next = node
@@ -136,23 +136,10 @@ class stack:
 unoDeck = convertDeck()
 
 
-class Hand: #// TODO: #5 Create class and linked list cpuHand
+class Hand: #// TODO: #5 Create class and linked list Hand
     def __init__(self):
         self.head:Card = Card("head", None)
         self.size:int = 0
-
-    def drawCard(self, deck:Deck, numCards:int):
-        print("drawwind Card")
-        for i in range(numCards):
-            print("inside loop ")
-            print("peeking deck")
-            temp = unoDeck.peek()
-            print("adding card to hand")
-            node = Card(temp[0], temp[1])
-            node.next = self.head.next
-            self.head.next = node
-            self.size += 1
-            unoDeck.pop()
 
     def getLength(self):
         return self.size
@@ -162,6 +149,19 @@ class Hand: #// TODO: #5 Create class and linked list cpuHand
         while temp != None:
             print(temp.value, temp.color)
             temp = temp.next
+
+    def drawCard(self, deck:Deck, numCards:int):
+        for i in range(numCards):
+            temp = unoDeck.peek()
+            node = Card(temp[0], temp[1])
+            node.next = self.head.next
+            self.head.next = node
+            self.size += 1
+            unoDeck.pop()
+
+    def canPlay(self, topCard:Card, cardToPlay:Card):
+        return topCard.color == cardToPlay.color or topCard.value == cardToPlay.value
+
 
 
 
@@ -184,8 +184,6 @@ def main():
     handBot = Hand()
     print(handBot.getLength())
     print(unoDeck.peek())
-
-    #error here //TODO #6:
     handBot.drawCard(unoDeck, 5)
     print(handBot.getLength())
     print(handBot.showHand())
