@@ -21,7 +21,6 @@ class Card:
         self.color:str = color
 
 class Deck:
-
     # Initializing a stack.
     # Use a dummy node, which is
     # easier for handling edge cases.
@@ -94,7 +93,8 @@ class Deck:
             randPos = random.randint(0,107)
             deck[cardPos], deck[randPos] = deck[randPos], deck[cardPos]
         
-        return deck            
+        return deck      
+
 
 def convertDeck():
     arrayDeck = Deck.buildDeck()
@@ -115,7 +115,27 @@ class stack:
         self.head:Card = Card("head", None)
         self.size:int = 0
 
-    def addCard(self, value:int, color:str): #//TODO: #3 pop Card from deck/Hand to stack
+    def getSize(self):
+        return self.size
+    
+    def isEmpty(self):
+        return self.size == 0
+    
+    def CreateStack(self, Deck:Deck):
+        if self.isEmpty():
+            temp = Deck.peek()
+            node = Card(temp[0], temp[1])
+            node.next = self.head.next # Make the new node point to the current head
+            self.head.next = node #!!! # Update the head to be the new node
+            self.size += 1
+            Deck.pop()
+            return True
+        
+        else:
+            return False
+
+
+    def addCard(self, value:int, color:str): #//TODO #7:
         node = Card(value, color)
         node.next = self.head.next
         self.head.next = node
@@ -135,6 +155,8 @@ class stack:
 
 unoDeck = convertDeck()
 
+Stapel = stack()
+Stapel.CreateStack(unoDeck)
 
 class Hand: #// TODO: #5 Create class and linked list Hand
     def __init__(self):
@@ -145,10 +167,10 @@ class Hand: #// TODO: #5 Create class and linked list Hand
         return self.size
     
     def showHand(self):
-        temp = self.head.next
-        while temp != None:
-            print(temp.value, temp.color)
-            temp = temp.next
+        current = self.head.next
+        while current != None:
+            print(current.value, current.color)
+            current = current.next
 
     def drawCard(self, deck:Deck, numCards:int):
         for i in range(numCards):
@@ -160,7 +182,16 @@ class Hand: #// TODO: #5 Create class and linked list Hand
             unoDeck.pop()
 
     def canPlay(self, topCard:Card, cardToPlay:Card):
-        return topCard.color == cardToPlay.color or topCard.value == cardToPlay.value
+        temp = Stapel.peek()
+        return temp[0] == cardToPlay.color or temp[1] == cardToPlay.value
+    
+    def playCard(self, card:Card, cardToPlay:Card):
+        if self.canPlay(Stapel.peek(), card):
+            stack.addCard(card.value, card.color)
+            self.removeCard(card)
+            return True
+        else:
+            return False
 
 
 
@@ -168,12 +199,33 @@ class Hand: #// TODO: #5 Create class and linked list Hand
 print("-----------------------------------------------")
 print("main function")
 def main():
+    print("unoDeck size: ", unoDeck.getSize(),)
+    print("Top of the stack after creating:", Stapel.peek())
+    
+    handBot = Hand()
+    print(handBot.getLength())
+    handBot.drawCard(unoDeck, 5)
+    print(handBot.getLength())
+    handBot.showHand()
+    
+    print(Stapel.peek())
+    cardToPlay = Card("Rot", 5)
+    print("Can play card: ", handBot.canPlay(Stapel.peek(), cardToPlay))
+    if handBot.playCard(handBot.head.next, cardToPlay):
+        print("Card played successfully")
+    else:
+        print("Card can't be played")
 
-    print("-----------------")
-    print("Displaying the stack")
-    print("Deck in stacked linear list form:")
-    print(unoDeck.getSize())
 
+
+
+
+main()
+
+
+"""
+example driver code
+    print("Stapel wurde erstellt", "\n")
     print("\nTop of the stack (peek):", unoDeck.peek())
     print("\nLength of the stack(lenght):", unoDeck.getSize())
     print("Popping the top card:", unoDeck.pop())
@@ -181,12 +233,14 @@ def main():
     print("Top of the stack after popping:", unoDeck.peek())
 
 
-    handBot = Hand()
-    print(handBot.getLength())
-    print(unoDeck.peek())
+
+
     handBot.drawCard(unoDeck, 5)
-    print(handBot.getLength())
+    print("Anzahl der Karten in der Hand von Bot post draw: ", handBot.getLength())
+    print("-----------------------------------------------")
     print(handBot.showHand())
-
-
-main()
+    print("-----------------------------------------------")
+    handBot.playCard(handBot.head.next)
+    print(handBot.showHand())
+    print(Stapel.peek())
+"""
