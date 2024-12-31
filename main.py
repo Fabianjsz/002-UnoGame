@@ -12,8 +12,10 @@ from __future__ import annotations
 from tkinter import *
 import random
 
+unoDeck = None
+
 class Card:
-    def __init__(self, value:int, color:str):
+    def __init__(self, value:int, color:str, next:Card = None):
         self.next:Card = None
         self.value:int = value
         self.color:str = color
@@ -24,7 +26,7 @@ class Deck:
     # Use a dummy node, which is
     # easier for handling edge cases.
     def __init__(self):
-        self.head = Card("head",None)
+        self.head = Card("head",None, None)
         self.size = 0
 
     # Get the current size of the stack
@@ -62,7 +64,8 @@ class Deck:
         remove = self.head.next
         self.head.next = remove.next #!!! changed
         self.size -= 1
-        return remove.value
+        
+        return remove.value, remove.color
     
     # Build uno deck of 108 cards
     def buildDeck():
@@ -70,8 +73,8 @@ class Deck:
         
         #Define the card colors and values
         colors = ["Rot", "Gruen", "Gelb", "Blau"]
-        values = [0,1,2,3,4,5,6,7,8,9, "Ziehe Zwei", "Skip", "Reverse"]
-        wilds = ["Wild", "Wild Ziehe Vier"]
+        values = [0,1,2,3,4,5,6,7,8,9, "drawTwo", "Skip", "Reverse"]
+        wilds = ["Wild", "WildDrawFour"]
 
         #Create the numbered and special cards for each color
         for color in colors:
@@ -100,10 +103,11 @@ def convertDeck():
     for card in arrayDeck:
         temp = card.split(" ")
         print(temp)
-        if temp[0] == "Wild" or temp[0] == "Wild Ziehe Vier":
+        if temp[0] == "Wild" or temp[0] == "WildDrawFour":
             unoDeck.push(temp[0], None)
         else:
             unoDeck.push(temp[0], temp[1])
+    return unoDeck
 
 
 class stack:
@@ -129,23 +133,62 @@ class stack:
         self.head.next = None
         self.size = 0
 
+unoDeck = convertDeck()
 
 
-class cpuHand: #// TODO: Create class and linked list cpuHand
+class Hand: #// TODO: #5 Create class and linked list cpuHand
     def __init__(self):
         self.head:Card = Card("head", None)
+        self.size:int = 0
 
     def drawCard(self, deck:Deck, numCards:int):
+        print("drawwind Card")
         for i in range(numCards):
-            self.addCard(deck.pop())
+            print("inside loop ")
+            print("peeking deck")
+            temp = unoDeck.peek()
+            print("adding card to hand")
+            node = Card(temp[0], temp[1])
+            node.next = self.head.next
+            self.head.next = node
+            self.size += 1
+            unoDeck.pop()
+
+    def getLength(self):
+        return self.size
+    
+    def showHand(self):
+        temp = self.head.next
+        while temp != None:
+            print(temp.value, temp.color)
+            temp = temp.next
 
 
-class playerHand: #//TODO #2 Create Class and linked list Hand
-    def __init__(self):
-        self.head:Card = Card("head", None)
+
+print("-----------------------------------------------")
+print("main function")
+def main():
+
+    print("-----------------")
+    print("Displaying the stack")
+    print("Deck in stacked linear list form:")
+    print(unoDeck.getSize())
+
+    print("\nTop of the stack (peek):", unoDeck.peek())
+    print("\nLength of the stack(lenght):", unoDeck.getSize())
+    print("Popping the top card:", unoDeck.pop())
+    print("length of the stack post pop:", unoDeck.getSize())
+    print("Top of the stack after popping:", unoDeck.peek())
 
 
+    handBot = Hand()
+    print(handBot.getLength())
+    print(unoDeck.peek())
+
+    #error here //TODO #6:
+    handBot.drawCard(unoDeck, 5)
+    print(handBot.getLength())
+    print(handBot.showHand())
 
 
-
-
+main()
