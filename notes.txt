@@ -1,22 +1,25 @@
-Klassen:
+Classes:
 
 class Karte:  -> Check
-Node mit color value und next
+    -> Node mit color, value und next
 
 class Deck:
-    Stack mit 119 Karten
+    -> Stack mit 108 Karten
+    -> buildDeck():
+        Builds a shuffled uno deck into an array (L:108)
 
-class CPUHand:
-    def ziehen(X):
-        Zieht x Anzahl an Karten aus dem Deck in die Hand
-linked Liste mit den Spielbaren Karten
+fun BuildDeck:
+    -> Builds the array deck into a linked stack
 
 class SpielerHand():
-    def ziehen(X):
-        Zieht x Anzahl an Karten aus dem Deck in die handling
+    -> ziehen(X):
+         Draw x ammount of cards into hand
 
-    def spielKarte(Karte):
-        Speil die Karte x, soweit möglich, auf den Stapel aus
+    -> spielKarte(Karte):
+        play Card(X) onto stack if isPlayable() == True
+    -> isPlayable():
+        returns boolean wether card in playable or not
+
 
 class Stack:
 Stack, auf welchen nur neue values geadded werden können
