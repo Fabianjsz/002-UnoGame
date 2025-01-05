@@ -162,11 +162,13 @@ class Hand: #// TODO: #5 Create class and linked list Hand
     def __init__(self):
         self.head:Card = Card("head", None)
         self.size:int = 0
+        self.list:list = []
 
     def getLength(self):
         return self.size
     
     def showHand(self):
+        print("Hand:", self.list)
         current = self.head.next
         while current != None:
             print(current.value, current.color)
@@ -179,13 +181,16 @@ class Hand: #// TODO: #5 Create class and linked list Hand
             node.next = self.head.next
             self.head.next = node
             self.size += 1
+            self.list.append(temp)
+            print(list)
             unoDeck.pop()
+            
 
     def canPlay(self, topCard:Card, cardToPlay:Card):
         temp = Stapel.peek()
         return temp[0] == cardToPlay.color or temp[1] == cardToPlay.value
     
-    def playCard(self, card:Card, cardToPlay:Card):
+    def playCard(self, card:Card, cardToPlay:Card): #//TODO #6: play card also removes card from array
         if self.canPlay(Stapel.peek(), card):
             stack.addCard(card.value, card.color)
             self.removeCard(card)
@@ -243,4 +248,5 @@ example driver code
     handBot.playCard(handBot.head.next)
     print(handBot.showHand())
     print(Stapel.peek())
+
 """
