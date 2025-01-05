@@ -2,6 +2,7 @@ Classes:
 
 class Karte:  -> Check
     -> Node mit color, value und next
+    -> !!!! ZUERST KOMMT COLOR DAN VALUE
 
 class Deck:
     -> Stack mit 108 Karten
