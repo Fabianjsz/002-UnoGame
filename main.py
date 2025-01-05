@@ -182,7 +182,7 @@ class Hand: #// TODO: #5 Create class and linked list Hand
             self.head.next = node
             self.size += 1
             self.list.append(temp)
-            print(list)
+            print(self.list)
             unoDeck.pop()
             
 
