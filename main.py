@@ -12,20 +12,29 @@ from __future__ import annotations
 from tkinter import *
 import random
 
-unoDeck = None
+#------- variables -------
+
+cardWidth = 200
+cardLength = 300
+
+buttonWirdth = 100
+buttonHeight = 50
+
+#------- classes -------
 
 class Card:
-    def __init__(self, value:int, color:str, next:Card = None):
+    def __init__(self, color:str, value:int, next:Card = None):
         self.next:Card = None
-        self.value:int = value
         self.color:str = color
+        self.value:int = value
+
 
 class Deck:
     # Initializing a stack.
     # Use a dummy node, which is
     # easier for handling edge cases.
     def __init__(self):
-        self.head = Card("head",None, None)
+        self.head = Card("head",None)
         self.size = 0
 
     # Get the current size of the stack
@@ -44,13 +53,13 @@ class Deck:
         if self.isEmpty():
             return None
         else:
-            temp1 = self.head.next.value
-            temp2 = self.head.next.color
+            temp1 = self.head.next.color
+            temp2 = self.head.next.value
         return temp1, temp2
 
     # Push a value into the stack.
-    def push(self, value, color):
-        node = Card(value, color)
+    def push(self, color, value):
+        node = Card(color, value)
         node.next = self.head.next # Make the new node point to the current head
         self.head.next = node #!!! # Update the head to be the new node
         self.size += 1
@@ -64,7 +73,7 @@ class Deck:
         self.head.next = remove.next #!!! changed
         self.size -= 1
         
-        return remove.value, remove.color
+        return remove.color, remove.value
     
     # Build uno deck of 108 cards
     def buildDeck():
@@ -96,13 +105,15 @@ class Deck:
         return deck      
 
 
+# Converts array deck into linked list 
+# Return Value : unoDeck
+
 def convertDeck():
     arrayDeck = Deck.buildDeck()
     unoDeck = Deck()
 
     for card in arrayDeck:
         temp = card.split(" ")
-        print(temp)
         if temp[0] == "Wild" or temp[0] == "WildDrawFour":
             unoDeck.push(temp[0], None)
         else:
@@ -110,7 +121,7 @@ def convertDeck():
     return unoDeck
 
 
-class stack:
+class Stack:
     def __init__(self):
         self.head:Card = Card("head", None)
         self.size:int = 0
@@ -133,10 +144,9 @@ class stack:
         
         else:
             return False
-
-
-    def addCard(self, value:int, color:str): #//TODO #7:
-        node = Card(value, color)
+    
+    def addCard(self, color:str , value:int): #//TODO #7:
+        node = Card(color, value)
         node.next = self.head.next
         self.head.next = node
         self.size += 1
@@ -145,18 +155,19 @@ class stack:
         if self.isEmpty():
             return None
         else:
-            temp1 = self.head.next.value
-            temp2 = self.head.next.color
+            temp1 = self.head.next.color
+            temp2 = self.head.next.value
         return temp1, temp2
     
     def clear(self):
         self.head.next = None
         self.size = 0
 
-unoDeck = convertDeck()
 
-Stapel = stack()
-Stapel.CreateStack(unoDeck)
+unoDeck = convertDeck() # 108 Uno Karten werden in unoDeck gemischt
+
+Stapel = Stack() # Stapel wird erstellt
+Stapel.CreateStack(unoDeck) # Erste Karte wird auf den Stapel gelegt
 
 class Hand: #// TODO: #5 Create class and linked list Hand
     def __init__(self):
@@ -171,31 +182,54 @@ class Hand: #// TODO: #5 Create class and linked list Hand
         print("Hand:", self.list)
         current = self.head.next
         while current != None:
-            print(current.value, current.color)
+            print(current.color, current.value)
             current = current.next
 
     def drawCard(self, deck:Deck, numCards:int):
         for i in range(numCards):
-            temp = unoDeck.peek()
+            temp = deck.peek()
             node = Card(temp[0], temp[1])
-            node.next = self.head.next
-            self.head.next = node
-            self.size += 1
-            self.list.append(temp)
+            if self.head.next == None:
+                self.head.next = node
+                self.size += 1
+                self.list.append(temp)
+                deck.pop()
+            else:
+                current = self.head
+                while current.next != None:
+                    current = current.next
+                current.next = node
+                self.size += 1
+                self.list.append(temp)
+                deck.pop()
             print(self.list)
-            unoDeck.pop()
-            
 
-    def canPlay(self, topCard:Card, cardToPlay:Card):
-        temp = Stapel.peek()
-        return temp[0] == cardToPlay.color or temp[1] == cardToPlay.value
+    def canPlay(self, stapel:Stack, cardToPlay:Card):
+        temp = stapel.peek()
+        return str(temp[0]) == str(cardToPlay.color) or int(temp[1]) == int(cardToPlay.value)
     
-    def playCard(self, card:Card, cardToPlay:Card): #//TODO #6: play card also removes card from array
+    def playCard(self, stapel:Stack, card:Card, cardToPlay:Card): #//TODO #6: play card also removes card from array
         if self.canPlay(Stapel.peek(), card):
-            stack.addCard(card.value, card.color)
+            stapel.addCard(card.value, card.color)
             self.removeCard(card)
             return True
         else:
+            return False
+    
+    def removeCard(self, card:Card):
+        current = self.head
+        found = False
+        while current.next != None and not found:
+            if current.next == card:
+                found = True
+            else:
+                current = current.next
+        if found:
+            current.next = current.next.next
+            self.size -= 1
+            self.list.remove(card)
+        else:
+            print("Card not found in hand")
             return False
 
 
@@ -209,17 +243,15 @@ def main():
     
     handBot = Hand()
     print(handBot.getLength())
+    
     handBot.drawCard(unoDeck, 5)
     print(handBot.getLength())
     handBot.showHand()
     
     print(Stapel.peek())
-    cardToPlay = Card("Rot", 5)
-    print("Can play card: ", handBot.canPlay(Stapel.peek(), cardToPlay))
-    if handBot.playCard(handBot.head.next, cardToPlay):
-        print("Card played successfully")
-    else:
-        print("Card can't be played")
+    Stapel.addCard("Rot", 7)
+    print("top of the stack after adding card: ", Stapel.peek())
+    print("Can play card: ", handBot.canPlay(Stapel, Card("Rot", 5)))
 
 
 
