@@ -2,7 +2,7 @@ Classes:
 
 class Karte:  -> Check
     -> Node mit color, value und next
-    -> !!!! ZUERST KOMMT COLOR DAN VALUE
+    -> !!!! ZUERST KOMMT COLOR DAN VALUE (fixed)
 
 class Deck:
     -> Stack mit 108 Karten
@@ -31,4 +31,3 @@ funtkonen:
     getValue():
         return lenght
 
-    
