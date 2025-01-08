@@ -268,7 +268,10 @@ def main(game, turn):
         if answer == "y":
             answer = input("Kopf oder Zahl? (k/z) ")
             coin = random.randint(0,1)
-            
+            if coin == 0:
+                turn = 0
+            else:
+                turn = 1
             game = True
             print("Game started")
         else:
