@@ -13,12 +13,15 @@ from tkinter import *
 import random
 
 #------- variables -------
+game = False
+
 
 cardWidth = 200
 cardLength = 300
 
 buttonWirdth = 100
 buttonHeight = 50
+
 
 #------- classes -------
 
@@ -204,11 +207,10 @@ class Hand: #// TODO: #5 Create class and linked list Hand
                 deck.pop()
             print(self.list)
 
-    def canPlay(self, stapel:Stack, cardToPlay:Card):
-        temp = stapel.peek()
-        return str(temp[0]) == str(cardToPlay.color) or int(temp[1]) == int(cardToPlay.value)
+    def canPlay(self, topOfStack:Card, cardToPlay:Card):
+        return str(topOfStack[0]) == str(cardToPlay.color) or int(topOfStack[1]) == int(cardToPlay.value)
     
-    def playCard(self, stapel:Stack, card:Card, cardToPlay:Card): #//TODO #6: play card also removes card from array
+    def playCard(self, stapel:Stack, card:Card): #//TODO #6: play card also removes card from array
         if self.canPlay(Stapel.peek(), card):
             stapel.addCard(card.value, card.color)
             self.removeCard(card)
@@ -237,7 +239,7 @@ class Hand: #// TODO: #5 Create class and linked list Hand
 
 print("-----------------------------------------------")
 print("main function")
-def main():
+def main(game, turn):
     print("unoDeck size: ", unoDeck.getSize(),)
     print("Top of the stack after creating:", Stapel.peek())
     
@@ -251,13 +253,52 @@ def main():
     print(Stapel.peek())
     Stapel.addCard("Rot", 7)
     print("top of the stack after adding card: ", Stapel.peek())
-    print("Can play card: ", handBot.canPlay(Stapel, Card("Rot", 5)))
+    temp = Stapel.peek()
+    print(temp[0], "temp 1: ", temp[1])
+    print(Stapel.peek())
+    print("Can play card: ", handBot.canPlay(Stapel.peek(), Card("Rot", 5)))
+    print("error here?")
+    print("playing card: ", handBot.playCard(Stapel, Card("Rot", 5)))
+    print("top of the stack after playing card: ", Stapel.peek())
+    print("length of hand after playing card: ", handBot.getLength())
+
+    if game == False:
+        print("Do you wish to play a game?")
+        answer = input(" (y/n) ")
+        if answer == "y":
+            answer = input("Kopf oder Zahl? (k/z) ")
+            coin = random.randint(0,1)
+            
+            game = True
+            print("Game started")
+        else:
+            print("Game not started")
+    while game == True:
+        if turn == 1:
+            print("Your turn")
+            print("Top of the stack: ", Stapel.peek())
+            print("Your hand: ")
+            handBot.showHand()
+            print("Which card do you want to play?")
+            card = input("Enter the color and value of the card you want to play: ")
+            card = card.split(" ")
+            cardToPlay = Card(card[0], card[1])
+            if handBot.playCard(Stapel, cardToPlay):
+                print("Card played: ", cardToPlay.color, cardToPlay.value)
+                print("Top of the stack: ", Stapel.peek())
+                print("Hand length: ", handBot.getLength())
+                turn = 0
+            else:
+                print("You can't play that card. Please try again.")
+        break
 
 
 
 
 
-main()
+
+
+main(game)
 
 
 """
