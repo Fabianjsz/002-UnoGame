@@ -108,22 +108,6 @@ class Deck:
         return deck      
 
 
-# Converts array deck into linked list 
-# Return Value : unoDeck
-
-def convertDeck():
-    arrayDeck = Deck.buildDeck()
-    unoDeck = Deck()
-
-    for card in arrayDeck:
-        temp = card.split(" ")
-        if temp[0] == "Wild" or temp[0] == "WildDrawFour":
-            unoDeck.push(temp[0], None)
-        else:
-            unoDeck.push(temp[0], temp[1])
-    return unoDeck
-
-
 class Stack:
     def __init__(self):
         self.head:Card = Card("head", None)
@@ -166,11 +150,6 @@ class Stack:
         self.head.next = None
         self.size = 0
 
-
-unoDeck = convertDeck() # 108 Uno Karten werden in unoDeck gemischt
-
-Stapel = Stack() # Stapel wird erstellt
-Stapel.CreateStack(unoDeck) # Erste Karte wird auf den Stapel gelegt
 
 class Hand: #// TODO: #5 Create class and linked list Hand
     def __init__(self):
@@ -235,7 +214,26 @@ class Hand: #// TODO: #5 Create class and linked list Hand
             return False
 
 
+# Converts array deck into linked list 
+# Return Value : unoDeck
 
+def convertDeck():
+    arrayDeck = Deck.buildDeck()
+    unoDeck = Deck()
+
+    for card in arrayDeck:
+        temp = card.split(" ")
+        if temp[0] == "Wild" or temp[0] == "WildDrawFour":
+            unoDeck.push(temp[0], None)
+        else:
+            unoDeck.push(temp[0], temp[1])
+    return unoDeck
+
+
+unoDeck = convertDeck() # 108 Uno Karten werden in unoDeck gemischt
+
+Stapel = Stack() # Stapel wird erstellt
+Stapel.CreateStack(unoDeck) # Erste Karte wird auf den Stapel gelegt
 
 print("-----------------------------------------------")
 print("main function")
@@ -301,7 +299,7 @@ def main(game, turn):
 
 
 
-main(game)
+main(game, None)
 
 
 """
