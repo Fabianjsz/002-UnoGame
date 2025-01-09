@@ -119,6 +119,24 @@ class Stack:
     def isEmpty(self):
         return self.size == 0
     
+    def peek(self):
+        if self.isEmpty():
+            return None
+        else:
+            temp1 = self.head.next.color
+            temp2 = self.head.next.value
+        return temp1, temp2
+
+    def push(self, color:str , value:int): #//TODO #7:
+        node = Card(color, value)
+        node.next = self.head.next
+        self.head.next = node
+        self.size += 1
+    
+    def clear(self):
+        self.head.next = None
+        self.size = 0
+
     def CreateStack(self, Deck:Deck):
         if self.isEmpty():
             temp = Deck.peek()
@@ -131,24 +149,6 @@ class Stack:
         
         else:
             return False
-    
-    def addCard(self, color:str , value:int): #//TODO #7:
-        node = Card(color, value)
-        node.next = self.head.next
-        self.head.next = node
-        self.size += 1
-
-    def peek(self):
-        if self.isEmpty():
-            return None
-        else:
-            temp1 = self.head.next.color
-            temp2 = self.head.next.value
-        return temp1, temp2
-    
-    def clear(self):
-        self.head.next = None
-        self.size = 0
 
 
 class Hand: #// TODO: #5 Create class and linked list Hand
@@ -190,14 +190,14 @@ class Hand: #// TODO: #5 Create class and linked list Hand
         return str(topOfStack[0]) == str(cardToPlay.color) or int(topOfStack[1]) == int(cardToPlay.value)
     
     def playCard(self, stapel:Stack, card:Card): #//TODO #6: play card also removes card from array
-        if self.canPlay(Stapel.peek(), card):
-            stapel.addCard(card.value, card.color)
+        if self.canPlay(stapel.peek(), card):
+            stapel.push(card.value, card.color)
             self.removeCard(card)
             return True
         else:
             return False
     
-    def removeCard(self, card:Card):
+    def removeCard(self, card:Card): #//TODO #11
         current = self.head
         found = False
         while current.next != None and not found:
@@ -230,16 +230,48 @@ def convertDeck():
     return unoDeck
 
 
-unoDeck = convertDeck() # 108 Uno Karten werden in unoDeck gemischt
+def preGame(game):
+    answer = input("Do you wish to play a game?: \n(y/n) ")
+    if answer == "y":
+        answer = input("Kopf oder Zahl? \n(k/z) ")
+        coin = random.randint(0,1) #0 == Kopf, 1 == Zahl
+        if coin == 0 and answer == "k":
+            turn = 0 #//TODO #10 #Create turn system
+        elif coin == 0 and answer == "z":
+            turn = 1
+        elif coin == 1 and answer == "k":
+            turn = 1
+        elif coin == 1 and answer == "z":
+            turn = 0
+        else:
+            print("Fehler! Bitte versuchen Sie es erneut.")
+            preGame(game)    
+        game = True
+        print("Game started")
+        return game, turn
+    else:
+        print("Fehler! Bitte versuchen Sie es erneut.")
+        preGame(game)
 
-Stapel = Stack() # Stapel wird erstellt
-Stapel.CreateStack(unoDeck) # Erste Karte wird auf den Stapel gelegt
+def init():
+    unoDeck = convertDeck() # 108 Uno Karten werden in unoDeck gemischt
+
+    Stapel = Stack() # Stapel wird erstellt
+    Stapel.CreateStack(unoDeck) # Erste Karte wird auf den Stapel gelegt
+
+    handBot = Hand() # Hand von Bot wird erstellt
+    handBot.drawCard(unoDeck, 5) # 5 Karten werden gezogen
+
+    handSpieler = Hand() # Hand von Spieler wird erstellt
+    handSpieler.drawCard(unoDeck, 5) # 5 Karten werden gezogen
+
+
 
 print("-----------------------------------------------")
 print("main function")
-def main(game, turn):
+def main(game, turn, unoDeck, stapel, handBot, handSpieler):
     print("unoDeck size: ", unoDeck.getSize(),)
-    print("Top of the stack after creating:", Stapel.peek())
+    print("Top of the stack after creating:", stapel.peek())
     
     handBot = Hand()
     print(handBot.getLength())
@@ -248,45 +280,30 @@ def main(game, turn):
     print(handBot.getLength())
     handBot.showHand()
     
-    print(Stapel.peek())
-    Stapel.addCard("Rot", 7)
-    print("top of the stack after adding card: ", Stapel.peek())
-    temp = Stapel.peek()
+    print(stapel.peek())
+    stapel.push("Rot", 7)
+    print("top of the stack after adding card: ", stapel.peek())
+    temp = stapel.peek()
     print(temp[0], "temp 1: ", temp[1])
-    print(Stapel.peek())
-    print("Can play card: ", handBot.canPlay(Stapel.peek(), Card("Rot", 5)))
+    print(stapel.peek())
+    print("Can play card: ", handBot.canPlay(stapel.peek(), Card("Rot", 5)))
     print("error here?")
-    print("playing card: ", handBot.playCard(Stapel, Card("Rot", 5)))
-    print("top of the stack after playing card: ", Stapel.peek())
+    print("playing card: ", handBot.playCard(stapel, Card("Rot", 5)))
+    print("top of the stack after playing card: ", stapel.peek())
     print("length of hand after playing card: ", handBot.getLength())
-
-    if game == False:
-        print("Do you wish to play a game?")
-        answer = input(" (y/n) ")
-        if answer == "y":
-            answer = input("Kopf oder Zahl? (k/z) ")
-            coin = random.randint(0,1)
-            if coin == 0:
-                turn = 0
-            else:
-                turn = 1
-            game = True
-            print("Game started")
-        else:
-            print("Game not started")
     while game == True:
         if turn == 1:
             print("Your turn")
-            print("Top of the stack: ", Stapel.peek())
+            print("Top of the stack: ", stapel.peek())
             print("Your hand: ")
             handBot.showHand()
             print("Which card do you want to play?")
             card = input("Enter the color and value of the card you want to play: ")
             card = card.split(" ")
             cardToPlay = Card(card[0], card[1])
-            if handBot.playCard(Stapel, cardToPlay):
+            if handBot.playCard(stapel, cardToPlay):
                 print("Card played: ", cardToPlay.color, cardToPlay.value)
-                print("Top of the stack: ", Stapel.peek())
+                print("Top of the stack: ", stapel.peek())
                 print("Hand length: ", handBot.getLength())
                 turn = 0
             else:
@@ -295,11 +312,10 @@ def main(game, turn):
 
 
 
-
-
-
-
-main(game, None)
+pre = preGame(game) # Game start + reihenfolge bestimmen
+init() # Initialisierung
+pre = init()
+main(pre[0], pre[1], unoDeck:Deck, stapel:Stack, handBot:Hand, handSpieler:Hand) # Hauptfunktion
 
 
 """
@@ -322,5 +338,8 @@ example driver code
     handBot.playCard(handBot.head.next)
     print(handBot.showHand())
     print(Stapel.peek())
+
+    
+
 
 """
