@@ -78,13 +78,13 @@ class Deck:
         
         return remove.color, remove.value
     
-    # Build uno deck of 108 cards
+    # Build uno deck of 102 cards
     def buildDeck():
         deck = []
         
         #Define the card colors and values
         colors = ["Rot", "Gruen", "Gelb", "Blau"]
-        values = [0,1,2,3,4,5,6,7,8,9, "drawTwo", "Skip", "Reverse"]
+        values = [0,1,2,3,4,5,6,7,8,9, "drawTwo", "Reverse"]
         wilds = ["Wild", "WildDrawFour"]
 
         #Create the numbered and special cards for each color
@@ -99,10 +99,10 @@ class Deck:
         for i in range(4):
             deck.append(wilds[0])
             deck.append(wilds[1])
-        
+        print(len(deck))
         #Shuffle the deck
         for cardPos in range(len(deck)):
-            randPos = random.randint(0,107)
+            randPos = random.randint(0,99)
             deck[cardPos], deck[randPos] = deck[randPos], deck[cardPos]
         
         return deck      
@@ -187,7 +187,18 @@ class Hand: #// TODO: #5 Create class and linked list Hand
             print(self.list)
 
     def canPlay(self, topOfStack:Card, cardToPlay:Card):
-        return str(topOfStack[0]) == str(cardToPlay.color) or int(topOfStack[1]) == int(cardToPlay.value)
+        if str(topOfStack[1]) == "drawTwo" or str(topOfStack[1]) == "Reverse" or str(cardToPlay.value) == "drawTwo" or str(cardToPlay.value) == "Reverse":
+            return topOfStack[0] == cardToPlay.color
+        if str(topOfStack[1]) == "drawTwo" or str(topOfStack[1]) == "Reverse" and topOfStack[0] == cardToPlay.color:
+            return True
+        if str(cardToPlay.color) == "Wild" or str(cardToPlay.color) == "WildDrawFour":
+            return True
+        elif str(topOfStack[1]) == "drawTwo" or str(topOfStack[1]) == "Reverse" and str(topOfStack[0]) == str(cardToPlay.color):
+            return True
+        elif str(cardToPlay.value) == "drawTwo" or str(cardToPlay.value) == "Reverse" and topOfStack[0] == cardToPlay.color:
+            return True
+        else:
+            return str(topOfStack[0]) == str(cardToPlay.color) or int(topOfStack[1]) == int(cardToPlay.value)
     
     def playCard(self, stapel:Stack, color:str, value:int): #//TODO #6: play card also removes card from array
         card = Card(color, value)
@@ -223,12 +234,12 @@ class Hand: #// TODO: #5 Create class and linked list Hand
             print("Card not found in hand")
             return False
         
-    def checkAtributes(self, topOfStack, hand): #//Todo #12 Check if any card in hand can be played
-        for cards in self.size:
-            if self.canPlay(topOfStack, cards) == True:
+    def checkAtributes(self, topOfStack): #//Todo #12 Check if any card in hand can be played
+        for cards in range(len(self.list)):
+            temp = self.list[cards]
+            if self.canPlay(topOfStack, Card(temp[0], temp[1])) == True:
                 return True
-        self.canPlay(topOfStack, )
-        pass
+        return False
 
 
 # Converts array deck into linked list 
@@ -270,10 +281,12 @@ def turn():
         return  0
     else:
         print("Fehler! Bitte versuchen Sie es erneut.")
-        preGame(turn)  
+        turn()  
 
 def init():
     pass
+
+
 
 
 
@@ -293,7 +306,9 @@ def main(play, turn):
 
     handSpieler = Hand() # Hand von Spieler wird erstellt
     handSpieler.drawCard(unoDeck, 5) # 5 Karten werden gezogen
-
+    
+    stapel.push("None", 123)
+    handSpieler.checkAtributes(stapel.peek())
     # Variables
     playerTurn = turn
     playDirection = 1
@@ -303,10 +318,13 @@ def main(play, turn):
     while playing:
         if turn == 0:
             print("Your turn")
-            if handSpieler.checkAtributes(stapel.peek(), handSpieler) == True:
+            print("Top of the stack during your turn: ", stapel.peek())
+            print("debug: \n ist card playable?\n", handSpieler.checkAtributes(stapel.peek()))
+            if handSpieler.checkAtributes(stapel.peek()) == True:
+                
                 print("Top of the stack: ", stapel.peek())
                 print("Your hand: ")
-                handBot.showHand()
+                handSpieler.showHand()
                 print("Which card do you want to play?")
                 card = input("Enter the color and value of the card you want to play: ")
                 card = card.split(" ")
@@ -318,6 +336,7 @@ def main(play, turn):
                     turn = 0
             else:
                 print("You can't play that card. Please try again.")
+                turn = turn + 1
             
         elif turn == 1:
             print("Bot ist am Zug")
