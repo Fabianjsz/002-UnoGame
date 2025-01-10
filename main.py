@@ -78,7 +78,7 @@ class Deck:
         
         return remove.color, remove.value
     
-    # Build uno deck of 102 cards
+    # Build uno deck of 100 cards
     def buildDeck():
         deck = []
         
