@@ -229,19 +229,21 @@ class Hand: #// TODO: #5 Create class and linked list Hand
         current = self.head
         found = False
         while current.next != None and not found:
-            if current.next == card:
+            if current.next.color == card.color and current.next.value == card.value:
                 found = True
             else:
                 current = current.next
         if found:
+            #removing card from linked list
             current.next = current.next.next
             self.size -= 1
-            self.list.remove(card)
-        temp = (color, value)
-        for cards in self.list:
-            if cards == temp:
-                self.list.remove(cards)
-                print("removed card in array ", card.color, card.value)
+            #removing card from array
+            temp = (color, value)
+            for cards in self.list:
+                if cards == temp:
+                    self.list.remove(cards)
+                    print("removed card in array ", card.color, card.value)
+        
         else:
             print("Card not found in hand")
             return False
