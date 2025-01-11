@@ -26,10 +26,10 @@ buttonHeight = 50
 #------- classes -------
 
 class Card:
-    def __init__(self, color:str, value:int, next:Card = None):
+    def __init__(self, color:str, value:str, next:Card = None):
         self.next:Card = None
         self.color:str = color
-        self.value:int = value
+        self.value:str = value
 
 
 class Deck:
@@ -99,7 +99,7 @@ class Deck:
         for i in range(4):
             deck.append(wilds[0])
             deck.append(wilds[1])
-        print(len(deck))
+
         #Shuffle the deck
         for cardPos in range(len(deck)):
             randPos = random.randint(0,99)
@@ -127,7 +127,7 @@ class Stack:
             temp2 = self.head.next.value
         return temp1, temp2
 
-    def push(self, color:str , value:int): #//TODO #7:
+    def push(self, color:str , value:str): #//TODO #7:
         node = Card(color, value)
         node.next = self.head.next
         self.head.next = node
@@ -161,10 +161,11 @@ class Hand: #// TODO: #5 Create class and linked list Hand
         return self.size
     
     def showHand(self):
-        print("Hand:", self.list)
+        temp = 1
         current = self.head.next
         while current != None:
-            print(current.color, current.value)
+            print(temp, ")", current.color, current.value)
+            temp = temp + 1
             current = current.next
 
     def drawCard(self, deck:Deck, numCards:int):
@@ -189,9 +190,11 @@ class Hand: #// TODO: #5 Create class and linked list Hand
     def canPlay(self, topOfStack:Card, cardToPlay:Card):
         if str(topOfStack[1]) == "drawTwo" or str(topOfStack[1]) == "Reverse" or str(cardToPlay.value) == "drawTwo" or str(cardToPlay.value) == "Reverse":
             return topOfStack[0] == cardToPlay.color
-        if str(topOfStack[1]) == "drawTwo" or str(topOfStack[1]) == "Reverse" and topOfStack[0] == cardToPlay.color:
+        elif str(topOfStack[1]) == "drawTwo" or str(topOfStack[1]) == "Reverse" and topOfStack[0] == cardToPlay.color:
             return True
-        if str(cardToPlay.color) == "Wild" or str(cardToPlay.color) == "WildDrawFour":
+        elif str(cardToPlay.color) == "Wild" or str(cardToPlay.color) == "WildDrawFour":
+            return True
+        elif str(topOfStack[0]) == "Wild" or str(topOfStack[0]) == "WildDrawFour":
             return True
         elif str(topOfStack[1]) == "drawTwo" or str(topOfStack[1]) == "Reverse" and str(topOfStack[0]) == str(cardToPlay.color):
             return True
@@ -200,11 +203,17 @@ class Hand: #// TODO: #5 Create class and linked list Hand
         else:
             return str(topOfStack[0]) == str(cardToPlay.color) or int(topOfStack[1]) == int(cardToPlay.value)
     
-    def playCard(self, stapel:Stack, color:str, value:int): #//TODO #6: play card also removes card from array
-        card = Card(color, value)
+    def playCard(self, stapel:Stack, cardIndex:int): #//TODO #6: play card also removes card from array
+        cardToPlay = self.list[int(cardIndex) - 1]
+        print("Playing card: ", cardToPlay[0], cardToPlay[1]) #//TODO #12
+        
+        card = Card(cardToPlay[0], cardToPlay[1])
         if self.canPlay(stapel.peek(), card):
-            stapel.push(card.value, card.color)
-            self.removeCard(card)
+            print("Card can be played")
+            stapel.push(card.color, card.value)
+            print("error heere -----------------------------------")
+            print(card.color, card.value)
+            self.removeCard(card.color, card.value)
             for cards in self.list:
                 if cards == card:
                     self.list.remove(cards)
@@ -213,8 +222,10 @@ class Hand: #// TODO: #5 Create class and linked list Hand
         else:
             return False
     
-    def removeCard(self, color:str, value:int): #//TODO #11 remove card also removes card in array
+    def removeCard(self, color:str, value:str): #//TODO #11 remove card also removes card in array
         card = Card(color, value)
+        print(card.color, card.value)
+        print("values inside of remove card: ", color, value)
         current = self.head
         found = False
         while current.next != None and not found:
@@ -226,10 +237,11 @@ class Hand: #// TODO: #5 Create class and linked list Hand
             current.next = current.next.next
             self.size -= 1
             self.list.remove(card)
+        temp = (color, value)
         for cards in self.list:
-            if cards == card:
+            if cards == temp:
                 self.list.remove(cards)
-                print("removed card in array ", card)
+                print("removed card in array ", card.color, card.value)
         else:
             print("Card not found in hand")
             return False
@@ -286,7 +298,8 @@ def turn():
 def init():
     pass
 
-
+def botMove(stapel:Stack, handBot:Hand):
+    pass
 
 
 
@@ -307,83 +320,53 @@ def main(play, turn):
     handSpieler = Hand() # Hand von Spieler wird erstellt
     handSpieler.drawCard(unoDeck, 5) # 5 Karten werden gezogen
     
-    stapel.push("None", 123)
-    handSpieler.checkAtributes(stapel.peek())
     # Variables
     playerTurn = turn
-    playDirection = 1
     playing = play
 
 
     while playing:
         if turn == 0:
             print("Your turn")
-            print("Top of the stack during your turn: ", stapel.peek())
             print("debug: \n ist card playable?\n", handSpieler.checkAtributes(stapel.peek()))
             if handSpieler.checkAtributes(stapel.peek()) == True:
+                if handSpieler.getLength() < 8:
+                    handSpieler.drawCard(unoDeck, 1)
+                else:
+                    print("Du hast bereits 8 Karten auf der Hand. Du kannst keine Karte ziehen.")
                 
+
                 print("Top of the stack: ", stapel.peek())
                 print("Your hand: ")
                 handSpieler.showHand()
-                print("Which card do you want to play?")
-                card = input("Enter the color and value of the card you want to play: ")
-                card = card.split(" ")
-                cardToPlay = Card(card[0], card[1])
-                if handBot.playCard(stapel, cardToPlay):
-                    print("Card played: ", cardToPlay.color, cardToPlay.value)
-                    print("Top of the stack: ", stapel.peek())
-                    print("Hand length: ", handBot.getLength())
+
+                if handSpieler.playCard(stapel, int(input("Enter the index of the card which you'd like to play: "))) == True:
+                    print("Karte erfolgreich gespielt.")
                     turn = 0
+                else:
+                    print("Du kannst diese Karte nicht spielen.")
             else:
-                print("You can't play that card. Please try again.")
+                print("Du kannst keine Karte Spielen.")
                 turn = turn + 1
-            
+
         elif turn == 1:
             print("Bot ist am Zug")
             turn = turn - 1
-        
-
-
-main(preGame(), turn()) # Hauptfunktion
-
-
-"""
-example driver code
-    print("Stapel wurde erstellt", "\n")
-    print("\nTop of the stack (peek):", unoDeck.peek())
-    print("\nLength of the stack(lenght):", unoDeck.getSize())
-    print("Popping the top card:", unoDeck.pop())
-    print("length of the stack post pop:", unoDeck.getSize())
-    print("Top of the stack after popping:", unoDeck.peek())
+            handBot.drawCard(unoDeck, 1)
+            if handBot.checkAtributes(stapel.peek()) == True:
+                botMove(stapel, handBot)
+                turn = turn - 1
+                
+            else:
+                print("Bot kann keine Karte spielen.")
+                turn = turn - 1
 
 
 
 
-    handBot.drawCard(unoDeck, 5)
-    print("Anzahl der Karten in der Hand von Bot post draw: ", handBot.getLength())
-    print("-----------------------------------------------")
-    print(handBot.showHand())
-    print("-----------------------------------------------")
-    handBot.playCard(handBot.head.next)
-    print(handBot.showHand())
-    print(Stapel.peek())
+
+#main(preGame(), turn()) # Hauptfunktion
 
 
-    print("unoDeck size: ", unoDeck.getSize(),)
-    print("Top of the stack after creating:", stapel.peek())
-    
-    
-    print(stapel.peek())
-    stapel.push("Rot", 7)
-    print("top of the stack after adding card: ", stapel.peek())
-    temp = stapel.peek()
-    print(temp[0], "temp 1: ", temp[1])
-    print(stapel.peek())
-    print("Can play card: ", handBot.canPlay(stapel.peek(), Card("Rot", 5)))
-    print("error here?")
-    print("playing card: ", handBot.playCard(stapel, Card("Rot", 5)))
-    print("top of the stack after playing card: ", stapel.peek())
-    print("length of hand after playing card: ", handBot.getLength())
+main(True, 0) # Test aufruf der Hauptfunktion
 
-
-"""
