@@ -172,6 +172,12 @@ class Hand: #// TODO: #5 Create class and linked list Hand
     def getLength(self):
         return self.size
     
+    def checkUno(self):
+        if self.size <= 1:
+            return False
+        else:
+            return "UNO - Letzte Karte!"
+    
     def showHand(self):
         temp = 1
         current = self.head.next
@@ -309,7 +315,7 @@ def init():
 def cardEffect(card:Card, handGegner:Hand, unoDeck:Deck, topOfStack:Card):
     if card[1] == "drawTwo":
         handGegner.drawCard(unoDeck, 2)
-        print("Cpu zieht 2 karten ", handGegner.size())
+        print("Cpu zieht 2 karten ", handGegner.getLength())
     elif card[1] == "Reverse":
             return "reverse"
     elif card[0] == "Wild":
@@ -346,7 +352,45 @@ def cardEffect(card:Card, handGegner:Hand, unoDeck:Deck, topOfStack:Card):
 
 
 def botMove(stapel:Stack, handBot:Hand):
-    pass
+    temp = stapel.peek()
+    card = Card(temp[0], temp[1])
+    print("inside of removeCard: ", card.color, card.value)
+    current = handBot.head
+    found = False
+    count = 1
+    while current.next != None and not found:
+        
+        if handBot.canPlay(stapel.peek(),Card(current.next.color, current.next.value)):
+            found = True
+        else:
+            current = current.next
+            count = count + 1
+    if found:
+        if handBot.playCard(stapel, count) == True:
+            if current.color == "Wild" or current.color == "WildDrawFour":
+                list = [0,0,0,0] # Blue, Red, Yellow, Gree
+                while current.next != None:
+                    if current.color == "Blau":
+                        list[0] = list[0] + 1
+                    elif current.color == "Rot":
+                        list[1] = list[1] + 1
+                    elif current.color == "Gelb":
+                        list[2] = list[2] + 1
+                    elif current.color == "Gruen":
+                        list[3] = list[3] + 1
+                sortedList = list.sort
+                index = list.index(sortedList[3])
+                if index == 0:
+                    return "Blau"
+                if index == 1:
+                    return "Rot"
+                if index == 2:
+                    return "Gelb"
+                if index == 3:
+                    return "Gruen"
+                
+            
+    
 
 
 
@@ -376,18 +420,20 @@ def main(play, turn):
         if unoDeck.getSize() >= 0:
             if turn == 0:
                 print("Your turn")
+                drawn = False
+                print(stapel.peek())
+                
+                handSpieler.checkUno()
                 print("debug: \n ist card playable?\n", handSpieler.checkAtributes(stapel.peek()))
-                if handSpieler.getLength() < 10:
-                        handSpieler.drawCard(unoDeck, 1)
-                else:
-                    print("Du hast bereits 10 Karten auf der Hand. Du kannst keine Karte ziehen.")
+                
 
                 if handSpieler.checkAtributes(stapel.peek()) == True:
                     print("Top of the stack: ", stapel.peek())
                     print("Your hand: ")
                     handSpieler.showHand()
 
-                    if handSpieler.playCard(stapel, int(input("Enter the index of the card which you'd like to play: "))) == True:
+                    index = input("Enter the index of the card which you'd like to play: ")
+                    if handSpieler.playCard(stapel, int(index)) == True:
                         print("Karte erfolgreich gespielt.")
 
                         effect = cardEffect(stapel.peek(), handBot, unoDeck, stapel.peek())
@@ -403,16 +449,46 @@ def main(play, turn):
                             stapel.changeColor("Gruen")
                         print(stapel.peek())
 
+                        turn = turn + 1
+
+                    elif index == "":
+                        handSpieler.drawCard(unoDeck, 1)
+                    
                     else:
                         print("Du kannst diese Karte nicht spielen.")
                 else:
                     print("Du kannst keine Karte Spielen.")
+                    if handSpieler.getLength() < 10 and drawn == False:
+                        handSpieler.drawCard(unoDeck, 1)
+                    else:
+                        print("Du hast bereits 10 Karten auf der Hand. Du kannst keine Karte ziehen.")
+
                     turn = turn + 1
+                    
 
             if turn == 1:
                 print("Bot's turn")
-                break
-                turn = 0
+                drawn = False
+                handBot.checkUno()
+                if botMove(stapel, handBot) == True:
+                    turn = turn - 1    
+                
+                elif botMove(stapel, handBot) == False and drawn == False:
+                    handBot.drawCard(unoDeck, 1)
+
+                elif botMove(stapel, handBot) == "Blau":
+                    stapel.changeColor("Blau")
+                elif botMove(stapel, handBot) == "Rot":
+                    stapel.changeColor("Rot")
+                elif botMove(stapel, handBot) == "Gelb":
+                    stapel.changeColor("Gelb")
+                elif botMove(stapel, handBot) == "Gruen":
+                    stapel.changeColor("Gruen")
+
+                else:
+                    print("Bot already drew card this turn")    
+                    turn = turn - 1
+
                 """
                 print("debug: \n ist card playable?\n", handBot.checkAtributes(stapel.peek()))
                 if handBot.checkAtributes(stapel.peek()) == True:
