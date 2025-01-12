@@ -346,54 +346,6 @@ def cardEffect(card:Card, handGegner:Hand, unoDeck:Deck, topOfStack:Card):
 
 
 
-
-
-
-
-
-def botMove(stapel:Stack, handBot:Hand):
-    temp = stapel.peek()
-    card = Card(temp[0], temp[1])
-    print("inside of removeCard: ", card.color, card.value)
-    current = handBot.head
-    found = False
-    count = 1
-    while current.next != None and not found:
-        
-        if handBot.canPlay(stapel.peek(),Card(current.next.color, current.next.value)):
-            found = True
-        else:
-            current = current.next
-            count = count + 1
-    if found:
-        if handBot.playCard(stapel, count) == True:
-            if current.color == "Wild" or current.color == "WildDrawFour":
-                list = [0,0,0,0] # Blue, Red, Yellow, Gree
-                while current.next != None:
-                    if current.color == "Blau":
-                        list[0] = list[0] + 1
-                    elif current.color == "Rot":
-                        list[1] = list[1] + 1
-                    elif current.color == "Gelb":
-                        list[2] = list[2] + 1
-                    elif current.color == "Gruen":
-                        list[3] = list[3] + 1
-                sortedList = list.sort
-                index = list.index(sortedList[3])
-                if index == 0:
-                    return "Blau"
-                if index == 1:
-                    return "Rot"
-                if index == 2:
-                    return "Gelb"
-                if index == 3:
-                    return "Gruen"
-                
-            
-    
-
-
-
 print("-----------------------------------------------")
 print("main function")
 
@@ -405,109 +357,101 @@ def main(play, turn):
     stapel = Stack() # Stapel wird erstellt
     stapel.CreateStack(unoDeck) # Erste Karte wird auf den Stapel gelegt
 
-    handBot = Hand() # Hand von Bot wird erstellt
-    handBot.drawCard(unoDeck, 5) # 5 Karten werden gezogen
-
-    handSpieler = Hand() # Hand von Spieler wird erstellt
-    handSpieler.drawCard(unoDeck, 5) # 5 Karten werden gezogen
+    handSpielerEins = Hand() # Hand von Spieler wird erstellt
+    handSpielerEins.drawCard(unoDeck, 5) # 5 Karten werden gezogen
     
+    handSpielerZwei = Hand() # Hand von Bot wird erstellt
+    handSpielerZwei.drawCard(unoDeck, 5) # 5 Karten werden gezogen
+
     # Variables
-    playerTurn = turn
     playing = play
 
 
     while playing:
         if unoDeck.getSize() >= 0:
             if turn == 0:
-                print("Your turn")
+                print("Spieler 1 ist drann:")
                 drawn = False
                 print(stapel.peek())
-                
-                handSpieler.checkUno()
-                print("debug: \n ist card playable?\n", handSpieler.checkAtributes(stapel.peek()))
-                
-
-                if handSpieler.checkAtributes(stapel.peek()) == True:
+                print("debug: \n ist card playable?\n", handSpielerEins.checkAtributes(stapel.peek()))
+                if handSpielerEins.checkAtributes(stapel.peek()) == True:
                     print("Top of the stack: ", stapel.peek())
                     print("Your hand: ")
-                    handSpieler.showHand()
+                    handSpielerEins.showHand()
 
                     index = input("Enter the index of the card which you'd like to play: ")
-                    if handSpieler.playCard(stapel, int(index)) == True:
+                    if handSpielerEins.playCard(stapel, int(index)) == True:
                         print("Karte erfolgreich gespielt.")
+                        if handSpielerEins.getLength() == 0:
+                            playing = False
+                        else:
+                            effect = cardEffect(stapel.peek(), handSpielerZwei, unoDeck, stapel.peek())
+                            print(effect)
+                            if effect == "reverse":
+                                turn = 0
+                            elif effect == "Blau":
+                                stapel.changeColor("Blau")
+                            elif effect == "Rot":
+                                stapel.changeColor("Rot")
+                            elif effect == "Gelb":
+                                stapel.changeColor("Gelb")
+                            elif effect == "Gruen":
+                                stapel.changeColor("Gruen")
+                            print(stapel.peek())
+                            if effect != "reverse":
+                                turn = turn + 1
 
-                        effect = cardEffect(stapel.peek(), handBot, unoDeck, stapel.peek())
-                        if effect == "reverse":
-                            turn = 0
-                        elif effect == "Blau":
-                            stapel.changeColor("Blau")
-                        elif effect == "Rot":
-                            stapel.changeColor("Rot")
-                        elif effect == "Gelb":
-                            stapel.changeColor("Gelb")
-                        elif effect == "Gruen":
-                            stapel.changeColor("Gruen")
-                        print(stapel.peek())
-
-                        turn = turn + 1
-
-                    elif index == "":
-                        handSpieler.drawCard(unoDeck, 1)
-                    
-                    else:
-                        print("Du kannst diese Karte nicht spielen.")
+                    elif handSpielerEins.playCard(stapel, int(index)) == False:
+                        print("du kannst diese karte nicht spielen")
                 else:
                     print("Du kannst keine Karte Spielen.")
-                    if handSpieler.getLength() < 10 and drawn == False:
-                        handSpieler.drawCard(unoDeck, 1)
-                    else:
-                        print("Du hast bereits 10 Karten auf der Hand. Du kannst keine Karte ziehen.")
-
-                    turn = turn + 1
+                    handSpielerEins.drawCard(unoDeck, 1)
+                    
                     
 
-            if turn == 1:
-                print("Bot's turn")
+
+            elif turn == 1:
+                print("Spieler 2 ist drann:")
                 drawn = False
-                handBot.checkUno()
-                if botMove(stapel, handBot) == True:
-                    turn = turn - 1    
-                
-                elif botMove(stapel, handBot) == False and drawn == False:
-                    handBot.drawCard(unoDeck, 1)
+                print(stapel.peek())
+                print("debug: \n ist card playable?\n", handSpielerZwei.checkAtributes(stapel.peek()))
+                if handSpielerZwei.checkAtributes(stapel.peek()) == True:
+                    print("Top of the stack: ", stapel.peek())
+                    print("Your hand: ")
+                    handSpielerZwei.showHand()
 
-                elif botMove(stapel, handBot) == "Blau":
-                    stapel.changeColor("Blau")
-                elif botMove(stapel, handBot) == "Rot":
-                    stapel.changeColor("Rot")
-                elif botMove(stapel, handBot) == "Gelb":
-                    stapel.changeColor("Gelb")
-                elif botMove(stapel, handBot) == "Gruen":
-                    stapel.changeColor("Gruen")
+                    index = input("Enter the index of the card which you'd like to play: ")
+                    if handSpielerZwei.playCard(stapel, int(index)) == True:
+                        print("Karte erfolgreich gespielt.")
+                        if handSpielerZwei.getLength() == 0:
+                            playing = False
+                        else:
+                            effect = cardEffect(stapel.peek(), handSpielerEins, unoDeck, stapel.peek())
+                            if effect == "reverse":
+                                turn = 1
+                            elif effect == "Blau":
+                                stapel.changeColor("Blau")
+                            elif effect == "Rot":
+                                stapel.changeColor("Rot")
+                            elif effect == "Gelb":
+                                stapel.changeColor("Gelb")
+                            elif effect == "Gruen":
+                                stapel.changeColor("Gruen")
+                            print(stapel.peek())
+                            if effect != "reverse":
+                                turn = turn - 1
 
+                    elif handSpielerZwei.playCard(stapel, int(index)) == False:
+                        print("du kannst diese karte nicht spielen")
                 else:
-                    print("Bot already drew card this turn")    
-                    turn = turn - 1
+                    print("Du kannst keine Karte Spielen.")
+                    handSpielerZwei.drawCard(unoDeck, 1)   
+    if playing == False:
+        if handSpielerEins.size == 0:
+            print("Spieler Eins hat gewonnen! ")
 
-                """
-                print("debug: \n ist card playable?\n", handBot.checkAtributes(stapel.peek()))
-                if handBot.checkAtributes(stapel.peek()) == True:
-                    while handBot.getLength() < 8:
-                        handBot.drawCard(unoDeck, 1)
-                    if handBot.getLength() == 8:
-                        print("Bot hat bereits 8 Karten auf der Hand. Bot kann keine Karte ziehen.")
-                        botMove(stapel, handBot)
-                while handBot.checkAtributes(stapel.peek()) == False:
-                    if handBot.getLength() < 8:
-                        handBot.drawCard(unoDeck, 1)
-                    elif handBot:
-                        print("Bot hat bereits 8 Karten auf der Hand. Bot kann keine Karte ziehen.")
-                        turn = turn - 1
-                if handBot.checkAtributes(stapel.peek()) == True:
-                    botMove(stapel, handBot)
-                """
-
-
+        elif handSpielerZwei.size == 0:
+            print("Spieler Zwei hat gewonnen! ")
 
 
 #main(preGame(), turn()) # Hauptfunktion
