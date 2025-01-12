@@ -30,6 +30,12 @@ class Card:
         self.next:Card = None
         self.color:str = color
         self.value:str = value
+    
+    def __str__(self):
+        return f"{self.color} {self.value}"
+    
+    def setColor(self, color:str):
+        self.color = color
 
 
 class Deck:
@@ -137,6 +143,12 @@ class Stack:
         self.head.next = None
         self.size = 0
 
+    def changeColor(self, color:str):
+        self.head.next.color = color
+        return True
+
+
+
     def CreateStack(self, Deck:Deck):
         if self.isEmpty():
             temp = Deck.peek()
@@ -185,23 +197,33 @@ class Hand: #// TODO: #5 Create class and linked list Hand
                 self.size += 1
                 self.list.append(temp)
                 deck.pop()
-            print(self.list)
 
     def canPlay(self, topOfStack:Card, cardToPlay:Card):
-        if str(topOfStack[1]) == "drawTwo" or str(topOfStack[1]) == "Reverse" or str(cardToPlay.value) == "drawTwo" or str(cardToPlay.value) == "Reverse":
-            return topOfStack[0] == cardToPlay.color
-        elif str(topOfStack[1]) == "drawTwo" or str(topOfStack[1]) == "Reverse" and topOfStack[0] == cardToPlay.color:
+        stackCard = Card(topOfStack[0], topOfStack[1])
+        newCard = Card(cardToPlay.color, cardToPlay.value)
+
+        if newCard.color == "Wild" or newCard.color == "WildDrawFour":
             return True
-        elif str(cardToPlay.color) == "Wild" or str(cardToPlay.color) == "WildDrawFour":
+        elif newCard.color == stackCard.color:
             return True
-        elif str(topOfStack[0]) == "Wild" or str(topOfStack[0]) == "WildDrawFour":
+        elif newCard.value == stackCard.value:
             return True
-        elif str(topOfStack[1]) == "drawTwo" or str(topOfStack[1]) == "Reverse" and str(topOfStack[0]) == str(cardToPlay.color):
-            return True
-        elif str(cardToPlay.value) == "drawTwo" or str(cardToPlay.value) == "Reverse" and topOfStack[0] == cardToPlay.color:
-            return True
-        else:
-            return str(topOfStack[0]) == str(cardToPlay.color) or int(topOfStack[1]) == int(cardToPlay.value)
+        
+
+        # if str(topOfStack[1]) == "drawTwo" or str(topOfStack[1]) == "Reverse" or str(cardToPlay.value) == "drawTwo" or str(cardToPlay.value) == "Reverse":
+        #     return topOfStack[0] == cardToPlay.color
+        # elif str(topOfStack[1]) == "drawTwo" or str(topOfStack[1]) == "Reverse" and topOfStack[0] == cardToPlay.color:
+        #     return True
+        # elif str(cardToPlay.color) == "Wild" or str(cardToPlay.color) == "WildDrawFour":
+        #     return True
+        # elif str(topOfStack[0]) == "Wild" or str(topOfStack[0]) == "WildDrawFour":
+        #     return True
+        # elif str(topOfStack[1]) == "drawTwo" or str(topOfStack[1]) == "Reverse" and str(topOfStack[0]) == str(cardToPlay.color):
+        #     return True
+        # elif str(cardToPlay.value) == "drawTwo" or str(cardToPlay.value) == "Reverse" and topOfStack[0] == cardToPlay.color:
+        #     return True
+        # else:
+        #     return str(topOfStack[0]) == str(cardToPlay.color) or int(topOfStack[1]) == int(cardToPlay.value)
     
     def playCard(self, stapel:Stack, cardIndex:int): #//TODO #6: play card also removes card from array
         cardToPlay = self.list[int(cardIndex) - 1]
@@ -211,21 +233,18 @@ class Hand: #// TODO: #5 Create class and linked list Hand
         if self.canPlay(stapel.peek(), card):
             print("Card can be played")
             stapel.push(card.color, card.value)
-            print("error heere -----------------------------------")
-            print(card.color, card.value)
             self.removeCard(card.color, card.value)
             for cards in self.list:
-                if cards == card:
+                if cards == (card.color, card.value):
                     self.list.remove(cards)
-                    print("removed card", card)
+                    print("removed card", card.color, card.value)
             return True
         else:
             return False
     
     def removeCard(self, color:str, value:str): #//TODO #11 remove card also removes card in array
         card = Card(color, value)
-        print(card.color, card.value)
-        print("values inside of remove card: ", color, value)
+        print("inside of removeCard: ", card.color, card.value)
         current = self.head
         found = False
         while current.next != None and not found:
@@ -243,6 +262,7 @@ class Hand: #// TODO: #5 Create class and linked list Hand
                 if cards == temp:
                     self.list.remove(cards)
                     print("removed card in array ", card.color, card.value)
+                    break
         
         else:
             print("Card not found in hand")
@@ -251,7 +271,8 @@ class Hand: #// TODO: #5 Create class and linked list Hand
     def checkAtributes(self, topOfStack): #//Todo #12 Check if any card in hand can be played
         for cards in range(len(self.list)):
             temp = self.list[cards]
-            if self.canPlay(topOfStack, Card(temp[0], temp[1])) == True:
+            tempCard = Card(str(temp[0]), str(temp[1]))
+            if self.canPlay(topOfStack, tempCard) == True:
                 return True
         return False
 
@@ -300,6 +321,43 @@ def turn():
 def init():
     pass
 
+def cardEffect(card:Card, handGegner:Hand, unoDeck:Deck, topOfStack:Card):
+    if card[1] == "drawTwo":
+        handGegner.drawCard(unoDeck, 2)
+        print("Cpu zieht 2 karten ", handGegner.size())
+    elif card[1] == "Reverse":
+            return "reverse"
+    elif card[0] == "Wild":
+        print("farbe der oberen karte: ", topOfStack[0])
+        color = input("wähle eine Farbe aus: (b/r/y/g)")
+        if color == "b":
+            return "Blau"
+        elif color == "r":
+            return "Rot"
+        elif color == "b":
+            return "Gelb"
+        elif color == "b":
+            return "Gruen"
+
+    elif card[0] == "WildDrawFour":
+        handGegner.drawCard(unoDeck, 4)
+        color = input("wähle eine Farbe aus: (b/r/y/g)")
+        if color == "b":
+            return "Blau"
+        elif color == "r":
+            return "Rot"
+        elif color == "y":
+            return "Gelb"
+        elif color == "g":
+            return "Gruen"
+    else:
+        print("Kein Effekt")
+
+
+
+
+
+
 def botMove(stapel:Stack, handBot:Hand):
     pass
 
@@ -328,41 +386,63 @@ def main(play, turn):
 
 
     while playing:
-        if turn == 0:
-            print("Your turn")
-            print("debug: \n ist card playable?\n", handSpieler.checkAtributes(stapel.peek()))
-            if handSpieler.checkAtributes(stapel.peek()) == True:
-                if handSpieler.getLength() < 8:
-                    handSpieler.drawCard(unoDeck, 1)
+        if unoDeck.getSize() >= 0:
+            if turn == 0:
+                print("Your turn")
+                print("debug: \n ist card playable?\n", handSpieler.checkAtributes(stapel.peek()))
+                if handSpieler.getLength() < 10:
+                        handSpieler.drawCard(unoDeck, 1)
                 else:
-                    print("Du hast bereits 8 Karten auf der Hand. Du kannst keine Karte ziehen.")
-                
+                    print("Du hast bereits 10 Karten auf der Hand. Du kannst keine Karte ziehen.")
 
-                print("Top of the stack: ", stapel.peek())
-                print("Your hand: ")
-                handSpieler.showHand()
+                if handSpieler.checkAtributes(stapel.peek()) == True:
+                    print("Top of the stack: ", stapel.peek())
+                    print("Your hand: ")
+                    handSpieler.showHand()
 
-                if handSpieler.playCard(stapel, int(input("Enter the index of the card which you'd like to play: "))) == True:
-                    print("Karte erfolgreich gespielt.")
-                    turn = 0
+                    if handSpieler.playCard(stapel, int(input("Enter the index of the card which you'd like to play: "))) == True:
+                        print("Karte erfolgreich gespielt.")
+
+                        effect = cardEffect(stapel.peek(), handBot, unoDeck, stapel.peek())
+                        if effect == "reverse":
+                            turn = 0
+                        elif effect == "Blau":
+                            stapel.changeColor("Blau")
+                        elif effect == "Rot":
+                            stapel.changeColor("Rot")
+                        elif effect == "Gelb":
+                            stapel.changeColor("Gelb")
+                        elif effect == "Gruen":
+                            stapel.changeColor("Gruen")
+                        print(stapel.peek())
+
+                    else:
+                        print("Du kannst diese Karte nicht spielen.")
                 else:
-                    print("Du kannst diese Karte nicht spielen.")
-            else:
-                print("Du kannst keine Karte Spielen.")
-                turn = turn + 1
+                    print("Du kannst keine Karte Spielen.")
+                    turn = turn + 1
 
-        elif turn == 1:
-            print("Bot ist am Zug")
-            turn = turn - 1
-            handBot.drawCard(unoDeck, 1)
-            if handBot.checkAtributes(stapel.peek()) == True:
-                botMove(stapel, handBot)
-                turn = turn - 1
-                
-            else:
-                print("Bot kann keine Karte spielen.")
-                turn = turn - 1
-
+            if turn == 1:
+                print("Bot's turn")
+                break
+                turn = 0
+                """
+                print("debug: \n ist card playable?\n", handBot.checkAtributes(stapel.peek()))
+                if handBot.checkAtributes(stapel.peek()) == True:
+                    while handBot.getLength() < 8:
+                        handBot.drawCard(unoDeck, 1)
+                    if handBot.getLength() == 8:
+                        print("Bot hat bereits 8 Karten auf der Hand. Bot kann keine Karte ziehen.")
+                        botMove(stapel, handBot)
+                while handBot.checkAtributes(stapel.peek()) == False:
+                    if handBot.getLength() < 8:
+                        handBot.drawCard(unoDeck, 1)
+                    elif handBot:
+                        print("Bot hat bereits 8 Karten auf der Hand. Bot kann keine Karte ziehen.")
+                        turn = turn - 1
+                if handBot.checkAtributes(stapel.peek()) == True:
+                    botMove(stapel, handBot)
+                """
 
 
 
