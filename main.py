@@ -386,6 +386,7 @@ def main(play, turn):
                             playing = False
                         else:
                             effect = cardEffect(stapel.peek(), handSpielerZwei, unoDeck, stapel.peek())
+                            print(effect)
                             if effect == "reverse":
                                 turn = 0
                             elif effect == "Blau":
@@ -397,7 +398,8 @@ def main(play, turn):
                             elif effect == "Gruen":
                                 stapel.changeColor("Gruen")
                             print(stapel.peek())
-                            turn = turn + 1
+                            if effect != "reverse":
+                                turn = turn + 1
 
                     elif handSpielerEins.playCard(stapel, int(index)) == False:
                         print("du kannst diese karte nicht spielen")
@@ -426,7 +428,7 @@ def main(play, turn):
                         else:
                             effect = cardEffect(stapel.peek(), handSpielerEins, unoDeck, stapel.peek())
                             if effect == "reverse":
-                                turn = 0
+                                turn = 1
                             elif effect == "Blau":
                                 stapel.changeColor("Blau")
                             elif effect == "Rot":
@@ -436,7 +438,8 @@ def main(play, turn):
                             elif effect == "Gruen":
                                 stapel.changeColor("Gruen")
                             print(stapel.peek())
-                            turn = turn + 1
+                            if effect != "reverse":
+                                turn = turn - 1
 
                     elif handSpielerZwei.playCard(stapel, int(index)) == False:
                         print("du kannst diese karte nicht spielen")
