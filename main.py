@@ -13,18 +13,10 @@ from tkinter import *
 import random
 
 #------- variables -------
+
 game = False
 
-
-cardWidth = 200
-cardLength = 300
-
-buttonWirdth = 100
-buttonHeight = 50
-
-
 #------- classes -------
-
 class Card:
     def __init__(self, color:str, value:str, next:Card = None):
         self.next:Card = None
@@ -147,8 +139,6 @@ class Stack:
         self.head.next.color = color
         return True
 
-
-
     def CreateStack(self, Deck:Deck):
         if self.isEmpty():
             temp = Deck.peek()
@@ -267,10 +257,7 @@ class Hand: #// TODO: #5 Create class and linked list Hand
                 return True
         return False
 
-
-# Converts array deck into linked list 
-# Return Value : unoDeck
-
+# ----- Functions -----
 def convertDeck():
     arrayDeck = Deck.buildDeck()
     unoDeck = Deck()
@@ -344,10 +331,8 @@ def cardEffect(card:Card, handGegner:Hand, unoDeck:Deck, topOfStack:Card):
     else:
         print("Kein Effekt")
 
-
-
-print("-----------------------------------------------")
-print("main function")
+def enter():
+    pass
 
 def main(play, turn):
     init() # Initialisierung
@@ -370,13 +355,13 @@ def main(play, turn):
     while playing:
         if unoDeck.getSize() >= 0:
             if turn == 0:
-                print("Spieler 1 ist drann:")
+                txtAus.insert(END, "Spieler 1 ist drann:")
                 drawn = False
-                print(stapel.peek())
-                print("debug: \n ist card playable?\n", handSpielerEins.checkAtributes(stapel.peek()))
+                txtAus.insert(END, stapel.peek())
+                txtAus.insert(END, "debug: \n ist card playable?\n", handSpielerEins.checkAtributes(stapel.peek()))
                 if handSpielerEins.checkAtributes(stapel.peek()) == True:
-                    print("Top of the stack: ", stapel.peek())
-                    print("Your hand: ")
+                    txtAus.insert(END, "Top of the stack: ", stapel.peek())
+                    txtAus.insert(END, "Your hand: ")
                     handSpielerEins.showHand()
 
                     index = input("Enter the index of the card which you'd like to play: ")
@@ -449,9 +434,46 @@ def main(play, turn):
     if playing == False:
         if handSpielerEins.size == 0:
             print("Spieler Eins hat gewonnen! ")
-
         elif handSpielerZwei.size == 0:
             print("Spieler Zwei hat gewonnen! ")
+
+# ----- GUI -----
+
+#Fenster
+fenster = Tk()
+fenster.geometry("1000x500")
+fenster.title("UNO CARD DUELL")
+fenster.configure(bg="white")
+
+
+
+
+
+#current Card
+topCard = Label(fenster)
+topCard.place(x=700, y=50, width=250, height=400)
+topCard.config(bg="red")
+
+
+
+# Textreturn
+txtAus = Text(fenster, bg="lightgrey", fg="black")
+txtAus.place(x=50, y=50, width=500, height=300)
+txtAus["font"] = ("Arial", 15)
+txtAus.insert(END, "Hallo Welt\n")
+
+# Entry for indexing
+entry = Entry(fenster, bg="white", fg="black")
+entry.place(x= 200, y=400, width=200, height=50)
+
+def test():
+    txtAus.insert(END, "Hello world\n")
+    txtAus.delete("1.0", END)
+
+# Buttons
+
+enter = Button(fenster, text="Bestaetigen", command=test)
+enter.place(x=50, y= 400, width=100, height=50)
 
 
 #main(preGame(), turn()) # Hauptfunktion
