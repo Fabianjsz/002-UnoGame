@@ -1,0 +1,71 @@
+Classes:
+
+class Karte:  -> Check
+    -> Node mit color, value und next
+    -> !!!! ZUERST KOMMT COLOR DAN VALUE (fixed)
+
+class Deck: -> Stack mit 108 Karten
+    -> getSize:
+        gibt die Größe des Decks wieder
+    -> isEmpty():
+        schaut ob Deck leer ist
+    -> peek():
+        gibt die werte der obersten Karte aus
+    -> push(color, value):
+        pusht eine karte mit werten color und value 
+    -> pop():
+        entfernt die oberste Karte aus dem Stack
+    -> buildDeck():
+        Generiert gemischtes unoDeck als array
+
+class Stack: -> Stack
+    > getSize:
+        gibt die Größe des Decks wieder
+    -> isEmpty():
+        schaut ob Deck leer ist
+    -> peek():
+        gibt die werte der obersten Karte aus
+    -> push(color, value):
+        pusht eine karte mit werten color und value
+    -> clear():
+        löscht den gesammten Stapel
+    -> CreateStack(deck)
+        nimmt sich die oberste Karte vom Deck 
+
+
+
+class Hand: -> linked Liste
+    -> get Lenght()
+        gibt die länge der Hand wieder
+    -> showHand()
+        gibt inhalt der hand als array und linked liste aus
+    -> drawCard(deck, numCards)
+        zieht numCards mänge aus deck
+    -> canPlay(topOfStack, cardToPlay)
+        Bestimmt anhand von obersten Karte ob Farbe oder Zahl stimmt
+    -> playCard(stack, card)
+        Werte der card werden als neue karte auf den Stapel gelegt
+    -> removeCard(card)
+        card wird aus der gelinkten liste gelöscht
+
+
+Funktionen:
+
+convertDeck():
+    - buildDeck baut array deck in arrayDeck
+    - erstellt unoDeck von der Klasse Deck()
+    - pushed die werte aus der arrayDeck in unoDeck 
+        -> gibt linked stack "unoDeck" aus
+
+preGame(game):
+    - Abfrage ob spiel gespielt werden will
+    - Reihenfolge wird per Münzwurf bestimmt 
+    - Bei falschen Eingaben ruft preGame sich selbst rekursiv auf
+        -> gibt boolean game und Reihenfolgenvariable zurück
+
+init():
+    - initialisierung des Spiels
+    1. unoDeck ist der ergebene stack aus buildDeck
+    2. Stapel wird erstellt und eine Karte wird hinzugefügt
+    3. CpuHand wird erstellt und zieht 5 Karten
+    4. SpielerHand wird erstellt und zieht 5 Karten

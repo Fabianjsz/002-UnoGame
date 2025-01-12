@@ -12,14 +12,33 @@ from __future__ import annotations
 from tkinter import *
 import random
 
+#------- variables -------
+game = False
+
+
+cardWidth = 200
+cardLength = 300
+
+buttonWirdth = 100
+buttonHeight = 50
+
+
+#------- classes -------
+
 class Card:
-    def __init__(self, value:int, color:str):
+    def __init__(self, color:str, value:str, next:Card = None):
         self.next:Card = None
-        self.value:int = value
         self.color:str = color
+        self.value:str = value
+    
+    def __str__(self):
+        return f"{self.color} {self.value}"
+    
+    def setColor(self, color:str):
+        self.color = color
+
 
 class Deck:
-
     # Initializing a stack.
     # Use a dummy node, which is
     # easier for handling edge cases.
@@ -43,13 +62,13 @@ class Deck:
         if self.isEmpty():
             return None
         else:
-            temp1 = self.head.next.value
-            temp2 = self.head.next.color
+            temp1 = self.head.next.color
+            temp2 = self.head.next.value
         return temp1, temp2
 
     # Push a value into the stack.
-    def push(self, value, color):
-        node = Card(value, color)
+    def push(self, color, value):
+        node = Card(color, value)
         node.next = self.head.next # Make the new node point to the current head
         self.head.next = node #!!! # Update the head to be the new node
         self.size += 1
@@ -62,16 +81,17 @@ class Deck:
         remove = self.head.next
         self.head.next = remove.next #!!! changed
         self.size -= 1
-        return remove.value
+        
+        return remove.color, remove.value
     
-    # Build uno deck of 108 cards
+    # Build uno deck of 100 cards
     def buildDeck():
         deck = []
         
         #Define the card colors and values
         colors = ["Rot", "Gruen", "Gelb", "Blau"]
-        values = [0,1,2,3,4,5,6,7,8,9, "Ziehe Zwei", "Skip", "Reverse"]
-        wilds = ["Wild", "Wild Ziehe Vier"]
+        values = [0,1,2,3,4,5,6,7,8,9, "drawTwo", "Reverse"]
+        wilds = ["Wild", "WildDrawFour"]
 
         #Create the numbered and special cards for each color
         for color in colors:
@@ -85,13 +105,171 @@ class Deck:
         for i in range(4):
             deck.append(wilds[0])
             deck.append(wilds[1])
-        
+
         #Shuffle the deck
         for cardPos in range(len(deck)):
-            randPos = random.randint(0,107)
+            randPos = random.randint(0,99)
             deck[cardPos], deck[randPos] = deck[randPos], deck[cardPos]
         
-        return deck            
+        return deck      
+
+
+class Stack:
+    def __init__(self):
+        self.head:Card = Card("head", None)
+        self.size:int = 0
+
+    def getSize(self):
+        return self.size
+    
+    def isEmpty(self):
+        return self.size == 0
+    
+    def peek(self):
+        if self.isEmpty():
+            return None
+        else:
+            temp1 = self.head.next.color
+            temp2 = self.head.next.value
+        return temp1, temp2
+
+    def push(self, color:str , value:str): #//TODO #7:
+        node = Card(color, value)
+        node.next = self.head.next
+        self.head.next = node
+        self.size += 1
+    
+    def clear(self):
+        self.head.next = None
+        self.size = 0
+
+    def changeColor(self, color:str):
+        self.head.next.color = color
+        return True
+
+
+
+    def CreateStack(self, Deck:Deck):
+        if self.isEmpty():
+            temp = Deck.peek()
+            node = Card(temp[0], temp[1])
+            node.next = self.head.next # Make the new node point to the current head
+            self.head.next = node #!!! # Update the head to be the new node
+            self.size += 1
+            Deck.pop()
+            return True
+        
+        else:
+            return False
+
+
+class Hand: #// TODO: #5 Create class and linked list Hand
+    def __init__(self):
+        self.head:Card = Card("head", None)
+        self.size:int = 0
+        self.list:list = []
+
+    def getLength(self):
+        return self.size
+    
+    def checkUno(self):
+        if self.size <= 1:
+            return False
+        else:
+            return "UNO - Letzte Karte!"
+    
+    def showHand(self):
+        temp = 1
+        current = self.head.next
+        while current != None:
+            print(temp, ")", current.color, current.value)
+            temp = temp + 1
+            current = current.next
+
+    def drawCard(self, deck:Deck, numCards:int):
+        for i in range(numCards):
+            temp = deck.peek()
+            node = Card(temp[0], temp[1])
+            if self.head.next == None:
+                self.head.next = node
+                self.size += 1
+                self.list.append(temp)
+                deck.pop()
+            else:
+                current = self.head
+                while current.next != None:
+                    current = current.next
+                current.next = node
+                self.size += 1
+                self.list.append(temp)
+                deck.pop()
+
+    def canPlay(self, topOfStack:Card, cardToPlay:Card):
+        stackCard = Card(topOfStack[0], topOfStack[1])
+        newCard = Card(cardToPlay.color, cardToPlay.value)
+
+        if newCard.color == "Wild" or newCard.color == "WildDrawFour":
+            return True
+        elif newCard.color == stackCard.color:
+            return True
+        elif newCard.value == stackCard.value:
+            return True
+        
+
+    def playCard(self, stapel:Stack, cardIndex:int): #//TODO #6: play card also removes card from array
+        cardToPlay = self.list[int(cardIndex) - 1]
+        print("Playing card: ", cardToPlay[0], cardToPlay[1]) #//TODO #12
+        
+        card = Card(cardToPlay[0], cardToPlay[1])
+        if self.canPlay(stapel.peek(), card):
+            print("Card can be played")
+            stapel.push(card.color, card.value)
+            self.removeCard(card.color, card.value)
+            for cards in self.list:
+                if cards == (card.color, card.value):
+                    self.list.remove(cards)
+                    print("removed card", card.color, card.value)
+            return True
+        else:
+            return False
+    
+    def removeCard(self, color:str, value:str): #//TODO #11 remove card also removes card in array
+        card = Card(color, value)
+        print("inside of removeCard: ", card.color, card.value)
+        current = self.head
+        found = False
+        while current.next != None and not found:
+            if current.next.color == card.color and current.next.value == card.value:
+                found = True
+            else:
+                current = current.next
+        if found:
+            #removing card from linked list
+            current.next = current.next.next
+            self.size -= 1
+            #removing card from array
+            temp = (color, value)
+            for cards in self.list:
+                if cards == temp:
+                    self.list.remove(cards)
+                    print("removed card in array ", card.color, card.value)
+                    break
+        
+        else:
+            print("Card not found in hand")
+            return False
+        
+    def checkAtributes(self, topOfStack): #//Todo #12 Check if any card in hand can be played
+        for cards in range(len(self.list)):
+            temp = self.list[cards]
+            tempCard = Card(str(temp[0]), str(temp[1]))
+            if self.canPlay(topOfStack, tempCard) == True:
+                return True
+        return False
+
+
+# Converts array deck into linked list 
+# Return Value : unoDeck
 
 def convertDeck():
     arrayDeck = Deck.buildDeck()
@@ -99,49 +277,241 @@ def convertDeck():
 
     for card in arrayDeck:
         temp = card.split(" ")
-        print(temp)
-        if temp[0] == "Wild" or temp[0] == "Wild Ziehe Vier":
+        if temp[0] == "Wild" or temp[0] == "WildDrawFour":
             unoDeck.push(temp[0], None)
         else:
             unoDeck.push(temp[0], temp[1])
+    return unoDeck
 
 
-class stack:
-    def __init__(self):
-        self.head:Card = Card("head", None)
-        self.size:int = 0
+def preGame():
+    answer = input("Do you wish to play a game?: \n(y/n) ")
+    if answer == "y":  
+        playing = True
+        print("Game started")
+        return playing
+    else:
+        print("Fehler! Bitte versuchen Sie es erneut.")
+        preGame(playing)
 
-    def push(self, value:int, color:str):
-        node = Card(value, color)
-        node.next = self.head.next
-        self.head.next = node
-        self.size += 1
+def turn():
+    answer = input("Kopf oder Zahl? \n(k/z) ")
+    coin = random.randint(0,1) #0 == Kopf, 1 == Zahl
+    if coin == 0 and answer == "k":
+        return 0 #//TODO #10 #Create turn system
+    elif coin == 0 and answer == "z":
+        return  1
+    elif coin == 1 and answer == "k":
+        return  1
+    elif coin == 1 and answer == "z":
+        return  0
+    else:
+        print("Fehler! Bitte versuchen Sie es erneut.")
+        turn()  
 
-    def peek(self):
-        if self.isEmpty():
-            return None
+def init():
+    pass
+
+def cardEffect(card:Card, handGegner:Hand, unoDeck:Deck, topOfStack:Card):
+    if card[1] == "drawTwo":
+        handGegner.drawCard(unoDeck, 2)
+        print("Cpu zieht 2 karten ", handGegner.getLength())
+    elif card[1] == "Reverse":
+            return "reverse"
+    elif card[0] == "Wild":
+        print("farbe der oberen karte: ", topOfStack[0])
+        color = input("wähle eine Farbe aus: (b/r/y/g)")
+        if color == "b":
+            return "Blau"
+        elif color == "r":
+            return "Rot"
+        elif color == "b":
+            return "Gelb"
+        elif color == "b":
+            return "Gruen"
+
+    elif card[0] == "WildDrawFour":
+        handGegner.drawCard(unoDeck, 4)
+        color = input("wähle eine Farbe aus: (b/r/y/g)")
+        if color == "b":
+            return "Blau"
+        elif color == "r":
+            return "Rot"
+        elif color == "y":
+            return "Gelb"
+        elif color == "g":
+            return "Gruen"
+    else:
+        print("Kein Effekt")
+
+
+
+
+
+
+
+
+def botMove(stapel:Stack, handBot:Hand):
+    temp = stapel.peek()
+    card = Card(temp[0], temp[1])
+    print("inside of removeCard: ", card.color, card.value)
+    current = handBot.head
+    found = False
+    count = 1
+    while current.next != None and not found:
+        
+        if handBot.canPlay(stapel.peek(),Card(current.next.color, current.next.value)):
+            found = True
         else:
-            temp1 = self.head.next.value
-            temp2 = self.head.next.color
-        return temp1, temp2
+            current = current.next
+            count = count + 1
+    if found:
+        if handBot.playCard(stapel, count) == True:
+            if current.color == "Wild" or current.color == "WildDrawFour":
+                list = [0,0,0,0] # Blue, Red, Yellow, Gree
+                while current.next != None:
+                    if current.color == "Blau":
+                        list[0] = list[0] + 1
+                    elif current.color == "Rot":
+                        list[1] = list[1] + 1
+                    elif current.color == "Gelb":
+                        list[2] = list[2] + 1
+                    elif current.color == "Gruen":
+                        list[3] = list[3] + 1
+                sortedList = list.sort
+                index = list.index(sortedList[3])
+                if index == 0:
+                    return "Blau"
+                if index == 1:
+                    return "Rot"
+                if index == 2:
+                    return "Gelb"
+                if index == 3:
+                    return "Gruen"
+                
+            
     
-    def clear(self):
-        self.head.next = None
-        self.size = 0
 
 
 
-class cpuHand: #// TODO: Create class and linked list cpuHand
-    def __init__(self):
-        self.head:Card = Card("head", None)
+print("-----------------------------------------------")
+print("main function")
+
+def main(play, turn):
+    init() # Initialisierung
+
+    unoDeck = convertDeck() # 108 Uno Karten werden in unoDeck gemischt
+
+    stapel = Stack() # Stapel wird erstellt
+    stapel.CreateStack(unoDeck) # Erste Karte wird auf den Stapel gelegt
+
+    handBot = Hand() # Hand von Bot wird erstellt
+    handBot.drawCard(unoDeck, 5) # 5 Karten werden gezogen
+
+    handSpieler = Hand() # Hand von Spieler wird erstellt
+    handSpieler.drawCard(unoDeck, 5) # 5 Karten werden gezogen
+    
+    # Variables
+    playerTurn = turn
+    playing = play
 
 
-class playerHand: #//TODO #2 Create Class and linked list Hand
-    def __init__(self):
-        self.head:Card = Card("head", None)
+    while playing:
+        if unoDeck.getSize() >= 0:
+            if turn == 0:
+                print("Your turn")
+                drawn = False
+                print(stapel.peek())
+                
+                handSpieler.checkUno()
+                print("debug: \n ist card playable?\n", handSpieler.checkAtributes(stapel.peek()))
+                
+
+                if handSpieler.checkAtributes(stapel.peek()) == True:
+                    print("Top of the stack: ", stapel.peek())
+                    print("Your hand: ")
+                    handSpieler.showHand()
+
+                    index = input("Enter the index of the card which you'd like to play: ")
+                    if handSpieler.playCard(stapel, int(index)) == True:
+                        print("Karte erfolgreich gespielt.")
+
+                        effect = cardEffect(stapel.peek(), handBot, unoDeck, stapel.peek())
+                        if effect == "reverse":
+                            turn = 0
+                        elif effect == "Blau":
+                            stapel.changeColor("Blau")
+                        elif effect == "Rot":
+                            stapel.changeColor("Rot")
+                        elif effect == "Gelb":
+                            stapel.changeColor("Gelb")
+                        elif effect == "Gruen":
+                            stapel.changeColor("Gruen")
+                        print(stapel.peek())
+
+                        turn = turn + 1
+
+                    elif index == "":
+                        handSpieler.drawCard(unoDeck, 1)
+                    
+                    else:
+                        print("Du kannst diese Karte nicht spielen.")
+                else:
+                    print("Du kannst keine Karte Spielen.")
+                    if handSpieler.getLength() < 10 and drawn == False:
+                        handSpieler.drawCard(unoDeck, 1)
+                    else:
+                        print("Du hast bereits 10 Karten auf der Hand. Du kannst keine Karte ziehen.")
+
+                    turn = turn + 1
+                    
+
+            if turn == 1:
+                print("Bot's turn")
+                drawn = False
+                handBot.checkUno()
+                if botMove(stapel, handBot) == True:
+                    turn = turn - 1    
+                
+                elif botMove(stapel, handBot) == False and drawn == False:
+                    handBot.drawCard(unoDeck, 1)
+
+                elif botMove(stapel, handBot) == "Blau":
+                    stapel.changeColor("Blau")
+                elif botMove(stapel, handBot) == "Rot":
+                    stapel.changeColor("Rot")
+                elif botMove(stapel, handBot) == "Gelb":
+                    stapel.changeColor("Gelb")
+                elif botMove(stapel, handBot) == "Gruen":
+                    stapel.changeColor("Gruen")
+
+                else:
+                    print("Bot already drew card this turn")    
+                    turn = turn - 1
+
+                """
+                print("debug: \n ist card playable?\n", handBot.checkAtributes(stapel.peek()))
+                if handBot.checkAtributes(stapel.peek()) == True:
+                    while handBot.getLength() < 8:
+                        handBot.drawCard(unoDeck, 1)
+                    if handBot.getLength() == 8:
+                        print("Bot hat bereits 8 Karten auf der Hand. Bot kann keine Karte ziehen.")
+                        botMove(stapel, handBot)
+                while handBot.checkAtributes(stapel.peek()) == False:
+                    if handBot.getLength() < 8:
+                        handBot.drawCard(unoDeck, 1)
+                    elif handBot:
+                        print("Bot hat bereits 8 Karten auf der Hand. Bot kann keine Karte ziehen.")
+                        turn = turn - 1
+                if handBot.checkAtributes(stapel.peek()) == True:
+                    botMove(stapel, handBot)
+                """
 
 
 
 
+#main(preGame(), turn()) # Hauptfunktion
 
+
+main(True, 0) # Test aufruf der Hauptfunktion
 
