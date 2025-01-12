@@ -210,21 +210,6 @@ class Hand: #// TODO: #5 Create class and linked list Hand
             return True
         
 
-        # if str(topOfStack[1]) == "drawTwo" or str(topOfStack[1]) == "Reverse" or str(cardToPlay.value) == "drawTwo" or str(cardToPlay.value) == "Reverse":
-        #     return topOfStack[0] == cardToPlay.color
-        # elif str(topOfStack[1]) == "drawTwo" or str(topOfStack[1]) == "Reverse" and topOfStack[0] == cardToPlay.color:
-        #     return True
-        # elif str(cardToPlay.color) == "Wild" or str(cardToPlay.color) == "WildDrawFour":
-        #     return True
-        # elif str(topOfStack[0]) == "Wild" or str(topOfStack[0]) == "WildDrawFour":
-        #     return True
-        # elif str(topOfStack[1]) == "drawTwo" or str(topOfStack[1]) == "Reverse" and str(topOfStack[0]) == str(cardToPlay.color):
-        #     return True
-        # elif str(cardToPlay.value) == "drawTwo" or str(cardToPlay.value) == "Reverse" and topOfStack[0] == cardToPlay.color:
-        #     return True
-        # else:
-        #     return str(topOfStack[0]) == str(cardToPlay.color) or int(topOfStack[1]) == int(cardToPlay.value)
-    
     def playCard(self, stapel:Stack, cardIndex:int): #//TODO #6: play card also removes card from array
         cardToPlay = self.list[int(cardIndex) - 1]
         print("Playing card: ", cardToPlay[0], cardToPlay[1]) #//TODO #12
@@ -352,6 +337,8 @@ def cardEffect(card:Card, handGegner:Hand, unoDeck:Deck, topOfStack:Card):
             return "Gruen"
     else:
         print("Kein Effekt")
+
+
 
 
 
