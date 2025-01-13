@@ -10,21 +10,15 @@
 #-------------------------------------------------------------------------------
 from __future__ import annotations
 from tkinter import *
+import tkinter.scrolledtext as st
 import random
 
 #------- variables -------
+
 game = False
-
-
-cardWidth = 200
-cardLength = 300
-
-buttonWirdth = 100
-buttonHeight = 50
-
+index = None
 
 #------- classes -------
-
 class Card:
     def __init__(self, color:str, value:str, next:Card = None):
         self.next:Card = None
@@ -147,11 +141,12 @@ class Stack:
         self.head.next.color = color
         return True
 
-
-
     def CreateStack(self, Deck:Deck):
         if self.isEmpty():
             temp = Deck.peek()
+            if temp[0] == "Wild" or temp[0] == "WildDrawFour":
+                Deck.pop()
+                temp = Deck.peek()
             node = Card(temp[0], temp[1])
             node.next = self.head.next # Make the new node point to the current head
             self.head.next = node #!!! # Update the head to be the new node
@@ -182,7 +177,8 @@ class Hand: #// TODO: #5 Create class and linked list Hand
         temp = 1
         current = self.head.next
         while current != None:
-            print(temp, ")", current.color, current.value)
+            string = (temp, ")", current.color, current.value, "\n")
+            txtAus.insert(END, string)
             temp = temp + 1
             current = current.next
 
@@ -218,7 +214,7 @@ class Hand: #// TODO: #5 Create class and linked list Hand
 
     def playCard(self, stapel:Stack, cardIndex:int): #//TODO #6: play card also removes card from array
         cardToPlay = self.list[int(cardIndex) - 1]
-        print("Playing card: ", cardToPlay[0], cardToPlay[1]) #//TODO #12
+        txtAus.insert(END, "Playing card: ", cardToPlay[0], cardToPlay[1], "\n")
         
         card = Card(cardToPlay[0], cardToPlay[1])
         if self.canPlay(stapel.peek(), card):
@@ -256,7 +252,7 @@ class Hand: #// TODO: #5 Create class and linked list Hand
                     break
         
         else:
-            print("Card not found in hand")
+            txtAus.insert(END, "Card not found in hand", "\n")
             return False
         
     def checkAtributes(self, topOfStack): #//Todo #12 Check if any card in hand can be played
@@ -267,10 +263,7 @@ class Hand: #// TODO: #5 Create class and linked list Hand
                 return True
         return False
 
-
-# Converts array deck into linked list 
-# Return Value : unoDeck
-
+# ----- Functions -----
 def convertDeck():
     arrayDeck = Deck.buildDeck()
     unoDeck = Deck()
@@ -315,11 +308,11 @@ def init():
 def cardEffect(card:Card, handGegner:Hand, unoDeck:Deck, topOfStack:Card):
     if card[1] == "drawTwo":
         handGegner.drawCard(unoDeck, 2)
-        print("Cpu zieht 2 karten ", handGegner.getLength())
+        txtAus.insert(END, "Cpu zieht 2 karten ", handGegner.getLength(), "\n")
     elif card[1] == "Reverse":
             return "reverse"
     elif card[0] == "Wild":
-        print("farbe der oberen karte: ", topOfStack[0])
+        txtAus.insert(END, "farbe der oberen karte: ", topOfStack[0], "\n")
         color = input("wähle eine Farbe aus: (b/r/y/g)")
         if color == "b":
             return "Blau"
@@ -342,12 +335,38 @@ def cardEffect(card:Card, handGegner:Hand, unoDeck:Deck, topOfStack:Card):
         elif color == "g":
             return "Gruen"
     else:
-        print("Kein Effekt")
+        txtAus.insert(END, "Kein Effekt", "\n")
+
+def labelUpdate(topOfStack:Card, label:Label):
+    if topOfStack[0] == "Gelb":
+        label.config(bg="yellow", fg="black")
+    elif topOfStack[0] == "Blau":
+        label.config(bg= "blue")
+    elif topOfStack[0] == "Rot":
+        label.config(bg="red")
+    elif topOfStack[0] == "Gruen":
+        label.config(bg="green")
+    elif topOfStack[0] == "Wild":
+        label.config(bg="black", text="Wild")
+    elif topOfStack[0] == "WilfDrawFour":
+        label.config(bg= "black",text="+4")
+    if topOfStack[1] == "DrawTwo":
+        label.config(text="+2")
+    elif topOfStack[1] == "Reverse":
+        label.config(text="Reverse")
+    
 
 
 
-print("-----------------------------------------------")
-print("main function")
+def enter():
+    global index
+    index = entry.get()
+    print(index)
+
+    entry.delete(0, END)
+
+    print(index)
+    pass
 
 def main(play, turn):
     init() # Initialisierung
@@ -370,25 +389,28 @@ def main(play, turn):
     while playing:
         if unoDeck.getSize() >= 0:
             if turn == 0:
-                print("Spieler 1 ist drann:")
+                txtAus.insert(END, "Spieler 1 ist drann:\n")
+                labelUpdate(stapel.peek(), topCard)
                 drawn = False
-                print(stapel.peek())
                 print("debug: \n ist card playable?\n", handSpielerEins.checkAtributes(stapel.peek()))
                 if handSpielerEins.checkAtributes(stapel.peek()) == True:
-                    print("Top of the stack: ", stapel.peek())
-                    print("Your hand: ")
+                    #txtAus.insert(END, "Top of the stack: \n", stapel.peek())
+                    txtAus.insert(END, "Your hand:\n")
                     handSpielerEins.showHand()
 
                     index = input("Enter the index of the card which you'd like to play: ")
                     if handSpielerEins.playCard(stapel, int(index)) == True:
-                        print("Karte erfolgreich gespielt.")
+                        txtAus.insert(END, "Karte erfolgreich gespielt.", "\n")
+                        labelUpdate(stapel.peek(), topCard)
                         if handSpielerEins.getLength() == 0:
                             playing = False
                         else:
                             effect = cardEffect(stapel.peek(), handSpielerZwei, unoDeck, stapel.peek())
-                            print(effect)
+                            #print(effect)
+                            labelUpdate(stapel.peek(), topCard)
                             if effect == "reverse":
                                 turn = 0
+                            
                             elif effect == "Blau":
                                 stapel.changeColor("Blau")
                             elif effect == "Rot":
@@ -397,32 +419,38 @@ def main(play, turn):
                                 stapel.changeColor("Gelb")
                             elif effect == "Gruen":
                                 stapel.changeColor("Gruen")
-                            print(stapel.peek())
+                            #print(stapel.peek())
+                            labelUpdate(stapel.peek(), topCard)
                             if effect != "reverse":
+                                #//clear
                                 turn = turn + 1
 
                     elif handSpielerEins.playCard(stapel, int(index)) == False:
-                        print("du kannst diese karte nicht spielen")
+                        #//clear
+                        txtAus.insert(END, "du kannst diese karte nicht spielen\n")
                 else:
-                    print("Du kannst keine Karte Spielen.")
+                    #//clear
+                    txtAus.insert(END, "Du kannst keine Karte Spielen.\n")
                     handSpielerEins.drawCard(unoDeck, 1)
                     
                     
 
 
             elif turn == 1:
-                print("Spieler 2 ist drann:")
+                txtAus.insert(END, "Spieler 2 ist drann:","\n")
+                labelUpdate(stapel.peek(), topCard)
                 drawn = False
-                print(stapel.peek())
+                
                 print("debug: \n ist card playable?\n", handSpielerZwei.checkAtributes(stapel.peek()))
                 if handSpielerZwei.checkAtributes(stapel.peek()) == True:
-                    print("Top of the stack: ", stapel.peek())
-                    print("Your hand: ")
+                    #txtAus.insert(END, "Top of the stack: ", stapel.peek(), "\n")
+                    txtAus.insert(END, "Your hand:\n")
                     handSpielerZwei.showHand()
 
                     index = input("Enter the index of the card which you'd like to play: ")
                     if handSpielerZwei.playCard(stapel, int(index)) == True:
-                        print("Karte erfolgreich gespielt.")
+                        txtAus.insert(END, "Karte erfolgreich gespielt.", "\n")
+                        labelUpdate(stapel.peek(), topCard)
                         if handSpielerZwei.getLength() == 0:
                             playing = False
                         else:
@@ -437,21 +465,60 @@ def main(play, turn):
                                 stapel.changeColor("Gelb")
                             elif effect == "Gruen":
                                 stapel.changeColor("Gruen")
-                            print(stapel.peek())
+                            #print(stapel.peek())
                             if effect != "reverse":
                                 turn = turn - 1
+                            labelUpdate(stapel.peek(), topCard)
 
                     elif handSpielerZwei.playCard(stapel, int(index)) == False:
-                        print("du kannst diese karte nicht spielen")
+                        txtAus.insert(END, "du kannst diese karte nicht spielen", "\n")
                 else:
-                    print("Du kannst keine Karte Spielen.")
+                    txtAus.insert(END, "Du kannst keine Karte Spielen.", "\n")
                     handSpielerZwei.drawCard(unoDeck, 1)   
     if playing == False:
         if handSpielerEins.size == 0:
-            print("Spieler Eins hat gewonnen! ")
-
+            #//clear
+            txtAus.insert(END, "Spieler Eins hat gewonnen!\n")
         elif handSpielerZwei.size == 0:
-            print("Spieler Zwei hat gewonnen! ")
+            #//clear
+            txtAus.insert(END, "Spieler Zwei hat gewonnen!\n ")
+
+# ----- GUI -----
+
+#Fenster
+fenster = Tk()
+fenster.geometry("1000x500")
+fenster.title("UNO CARD DUELL")
+fenster.configure(bg="white")
+
+
+
+
+
+#current Card
+topCard = Label(fenster)
+topCard.place(x=700, y=50, width=250, height=400)
+topCard.config(bg="grey", fg="white", text="UNO")
+
+
+
+# Textreturn
+txtAus = st.ScrolledText(fenster, width=500, height=300, bg="lightgrey", fg="black", font=("Times New Roman", 15))
+txtAus.place(x=50, y=50, width=500, height=300)
+
+# Entry for indexing
+entry = Entry(fenster, bg="white", fg="black")
+entry.place(x= 200, y=400, width=200, height=50)
+
+def test():
+    txtAus.insert(END, "Hello world\n")
+    txtAus.delete("1.0", END)
+
+# Buttons
+
+enter = Button(fenster, text="Bestaetigen", command=test)
+enter.place(x=50, y= 400, width=100, height=50)
+
 
 
 #main(preGame(), turn()) # Hauptfunktion
