@@ -360,7 +360,27 @@ def labelUpdate(topOfStack:Card, label:Label):
         temp = topOfStack[1]
         label.config(text=str(temp))
 
+def yellowPress():
+    print("yellow pressed")
 
+def bluePress():
+    print("blue pressed")
+
+def redPress():
+    print("red pressed")
+
+def greenPress():
+    print("green pressed")
+
+def buttonPress(a):
+    if a == 1:
+        print("1")
+    if a == 2:
+        print("2")
+    if a == 3:
+        print("3")
+    if a == 4:
+        print("4")
 
 
 
@@ -489,8 +509,8 @@ fenster.title("UNO CARD DUELL")
 fenster.configure(bg="white")
 
 #Player turn sign
-turnSign = Label(fenster, text=playerTurn)
-turnSign.place(x=50, y=15, width=250, height=35)
+turnSign = Label(fenster, text=playerTurn, bg="darkgrey")
+turnSign.place(x=200, y=40, width=250, height=35)
 
 #current Card
 topCard = Label(fenster)
@@ -500,29 +520,27 @@ topCard.config(bg="grey", fg="white", text="UNO")
 
 #Wild card Label
 wild = Label(fenster, bg="grey")
-wild.place(x=50, y=50, width=350, height=250)
-
+wild.place(x=150, y=250, width=350, height=250)
 
 #Color Buttons
-
-chooseYellow = Button(wild)
+chooseYellow = Button(wild, command=buttonPress(1))
 chooseYellow.place(x=0, y=0, width=175 , height=125)
 chooseYellow.config(bg="yellow")
 
+chooseBlue = Button(wild, command=buttonPress(2))
+chooseBlue.place(x=175, y=0, width=175, height=125)
+chooseBlue.config(bg="blue")
 
-chooseBlue = Button(wild, width=175, height=125, background="blue")
-chooseBlue.place(x=175, y=0)
+chooseRed = Button(wild, command=buttonPress(3))
+chooseRed.place(x=0, y=125, width=175, height=125)
+chooseRed.config(bg="red")
 
-chooseRed = Button(wild, width=175, height=120)
-chooseRed.place(x=0, y=125)
-
-chooseGreen = Button(wild, width=175, height=125)
-chooseGreen.place(x=175, y=125)
-
-
+chooseGreen = Button(wild, command=buttonPress(4))
+chooseGreen.place(x=175, y=125, width=175, height=125)
+chooseGreen.config(bg="green")
 
 main(preGame(), turn()) # Hauptfunktion
-#fenster.mainloop()
+
 
 #main(True, 0) # Test aufruf der Hauptfunktion
 
