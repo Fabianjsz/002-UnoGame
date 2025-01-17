@@ -11,12 +11,14 @@
 from __future__ import annotations
 from tkinter import *
 import tkinter.scrolledtext as st
+import tkinter as tk
 import random
 
 #------- variables -------
 
 game = False
 index = None
+playerTurn = "Spieler 1 ist dran!"
 
 #------- classes -------
 class Card:
@@ -178,7 +180,7 @@ class Hand: #// TODO: #5 Create class and linked list Hand
         current = self.head.next
         while current != None:
             string = (temp, ")", current.color, current.value, "\n")
-            txtAus.insert(END, string)
+            print(string)
             temp = temp + 1
             current = current.next
 
@@ -214,7 +216,7 @@ class Hand: #// TODO: #5 Create class and linked list Hand
 
     def playCard(self, stapel:Stack, cardIndex:int): #//TODO #6: play card also removes card from array
         cardToPlay = self.list[int(cardIndex) - 1]
-        txtAus.insert(END, "Playing card: ", cardToPlay[0], cardToPlay[1], "\n")
+        print("Playing card: ", cardToPlay[0], cardToPlay[1])
 
         card = Card(cardToPlay[0], cardToPlay[1])
         if self.canPlay(stapel.peek(), card):
@@ -252,7 +254,7 @@ class Hand: #// TODO: #5 Create class and linked list Hand
                     break
 
         else:
-            txtAus.insert(END, "Card not found in hand", "\n")
+            print("Card not found in hand")
             return False
 
     def checkAtributes(self, topOfStack): #//Todo #12 Check if any card in hand can be played
@@ -308,11 +310,11 @@ def init():
 def cardEffect(card:Card, handGegner:Hand, unoDeck:Deck, topOfStack:Card):
     if card[1] == "drawTwo":
         handGegner.drawCard(unoDeck, 2)
-        txtAus.insert(END, "Cpu zieht 2 karten ", handGegner.getLength(), "\n")
+        print("Cpu zieht 2 karten ", handGegner.getLength())
     elif card[1] == "Reverse":
             return "reverse"
     elif card[0] == "Wild":
-        txtAus.insert(END, "farbe der oberen karte: ", topOfStack[0], "\n")
+        print("farbe der oberen karte: ", topOfStack[0])
         color = input("wähle eine Farbe aus: (b/r/y/g)")
         if color == "b":
             return "Blau"
@@ -335,7 +337,7 @@ def cardEffect(card:Card, handGegner:Hand, unoDeck:Deck, topOfStack:Card):
         elif color == "g":
             return "Gruen"
     else:
-        txtAus.insert(END, "Kein Effekt", "\n")
+        print("Kein Effekt")
 
 def labelUpdate(topOfStack:Card, label:Label):
     if topOfStack[0] == "Gelb":
@@ -361,15 +363,7 @@ def labelUpdate(topOfStack:Card, label:Label):
 
 
 
-def enter():
-    global index
-    index = entry.get()
-    print(index)
 
-    entry.delete(0, END)
-
-    print(index)
-    pass
 
 def main(play, turn):
     init() # Initialisierung
@@ -387,23 +381,23 @@ def main(play, turn):
 
     # Variables
     playing = play
-
+    
 
     while playing:
         if unoDeck.getSize() >= 0:
             if turn == 0:
-                txtAus.insert(END, "Spieler 1 ist drann:\n")
+                print("Spieler 1 ist drann:")
                 labelUpdate(stapel.peek(), topCard)
                 drawn = False
                 print("debug: \n ist card playable?\n", handSpielerEins.checkAtributes(stapel.peek()))
                 if handSpielerEins.checkAtributes(stapel.peek()) == True:
                     #txtAus.insert(END, "Top of the stack: \n", stapel.peek())
-                    txtAus.insert(END, "Your hand:\n")
+                    print("Your hand:")
                     handSpielerEins.showHand()
 
                     index = input("Enter the index of the card which you'd like to play: ")
                     if handSpielerEins.playCard(stapel, int(index)) == True:
-                        txtAus.insert(END, "Karte erfolgreich gespielt.", "\n")
+                        print("Karte erfolgreich gespielt.")
                         labelUpdate(stapel.peek(), topCard)
                         if handSpielerEins.getLength() == 0:
                             playing = False
@@ -430,29 +424,29 @@ def main(play, turn):
 
                     elif handSpielerEins.playCard(stapel, int(index)) == False:
                         #//clear
-                        txtAus.insert(END, "du kannst diese karte nicht spielen\n")
+                        print("du kannst diese karte nicht spielen")
                 else:
                     #//clear
-                    txtAus.insert(END, "Du kannst keine Karte Spielen.\n")
+                    print("Du kannst keine Karte Spielen.")
                     handSpielerEins.drawCard(unoDeck, 1)
 
 
 
 
             elif turn == 1:
-                txtAus.insert(END, "Spieler 2 ist drann:","\n")
+                print("Spieler 2 ist drann:")
                 labelUpdate(stapel.peek(), topCard)
                 drawn = False
 
                 print("debug: \n ist card playable?\n", handSpielerZwei.checkAtributes(stapel.peek()))
                 if handSpielerZwei.checkAtributes(stapel.peek()) == True:
                     #txtAus.insert(END, "Top of the stack: ", stapel.peek(), "\n")
-                    txtAus.insert(END, "Your hand:\n")
+                    print("Your hand:")
                     handSpielerZwei.showHand()
 
                     index = input("Enter the index of the card which you'd like to play: ")
                     if handSpielerZwei.playCard(stapel, int(index)) == True:
-                        txtAus.insert(END, "Karte erfolgreich gespielt.", "\n")
+                        print("Karte erfolgreich gespielt.")
                         labelUpdate(stapel.peek(), topCard)
                         if handSpielerZwei.getLength() == 0:
                             playing = False
@@ -474,58 +468,61 @@ def main(play, turn):
                             labelUpdate(stapel.peek(), topCard)
 
                     elif handSpielerZwei.playCard(stapel, int(index)) == False:
-                        txtAus.insert(END, "du kannst diese karte nicht spielen", "\n")
+                        print("du kannst diese karte nicht spielen")
                 else:
-                    txtAus.insert(END, "Du kannst keine Karte Spielen.", "\n")
+                    print("Du kannst keine Karte Spielen.")
                     handSpielerZwei.drawCard(unoDeck, 1)
     if playing == False:
         if handSpielerEins.size == 0:
             #//clear
-            txtAus.insert(END, "Spieler Eins hat gewonnen!\n")
+            print("Spieler Eins hat gewonnen!")
         elif handSpielerZwei.size == 0:
             #//clear
-            txtAus.insert(END, "Spieler Zwei hat gewonnen!\n ")
+            print("Spieler Zwei hat gewonnen!")
 
 # ----- GUI -----
 
 #Fenster
 fenster = Tk()
-fenster.geometry("1000x500")
+fenster.geometry("1000x700")
 fenster.title("UNO CARD DUELL")
 fenster.configure(bg="white")
 
-
-
-
+#Player turn sign
+turnSign = Label(fenster, text=playerTurn)
+turnSign.place(x=50, y=15, width=250, height=35)
 
 #current Card
 topCard = Label(fenster)
-topCard.place(x=700, y=50, width=250, height=400)
+topCard.place(x=690, y=60, width=250, height=400)
 topCard.config(bg="grey", fg="white", text="UNO")
 
 
+#Wild card Label
+wild = Label(fenster, bg="grey")
+wild.place(x=50, y=50, width=350, height=250)
 
-# Textreturn
-txtAus = st.ScrolledText(fenster, width=500, height=300, bg="lightgrey", fg="black", font=("Times New Roman", 15))
-txtAus.place(x=50, y=50, width=500, height=300)
 
-# Entry for indexing
-entry = Entry(fenster, bg="white", fg="black")
-entry.place(x= 200, y=400, width=200, height=50)
+#Color Buttons
 
-def test():
-    txtAus.insert(END, "Hello world\n")
-    txtAus.delete("1.0", END)
+chooseYellow = Button(wild)
+chooseYellow.place(x=0, y=0, width=175 , height=125)
+chooseYellow.config(bg="yellow")
 
-# Buttons
 
-enter = Button(fenster, text="Bestaetigen", command=test)
-enter.place(x=50, y= 400, width=100, height=50)
+chooseBlue = Button(wild, width=175, height=125, background="blue")
+chooseBlue.place(x=175, y=0)
+
+chooseRed = Button(wild, width=175, height=120)
+chooseRed.place(x=0, y=125)
+
+chooseGreen = Button(wild, width=175, height=125)
+chooseGreen.place(x=175, y=125)
 
 
 
 main(preGame(), turn()) # Hauptfunktion
-
+#fenster.mainloop()
 
 #main(True, 0) # Test aufruf der Hauptfunktion
 
