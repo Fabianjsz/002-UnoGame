@@ -24,10 +24,10 @@ class Card:
         self.next:Card = None
         self.color:str = color
         self.value:str = value
-    
+
     def __str__(self):
         return f"{self.color} {self.value}"
-    
+
     def setColor(self, color:str):
         self.color = color
 
@@ -75,13 +75,13 @@ class Deck:
         remove = self.head.next
         self.head.next = remove.next #!!! changed
         self.size -= 1
-        
+
         return remove.color, remove.value
-    
+
     # Build uno deck of 100 cards
     def buildDeck():
         deck = []
-        
+
         #Define the card colors and values
         colors = ["Rot", "Gruen", "Gelb", "Blau"]
         values = [0,1,2,3,4,5,6,7,8,9, "drawTwo", "Reverse"]
@@ -94,7 +94,7 @@ class Deck:
                 deck.append(cardVal)
                 if value != 0:
                     deck.append(cardVal)
-        
+
         #Add the wild cards to the deck
         for i in range(4):
             deck.append(wilds[0])
@@ -104,8 +104,8 @@ class Deck:
         for cardPos in range(len(deck)):
             randPos = random.randint(0,99)
             deck[cardPos], deck[randPos] = deck[randPos], deck[cardPos]
-        
-        return deck      
+
+        return deck
 
 
 class Stack:
@@ -115,10 +115,10 @@ class Stack:
 
     def getSize(self):
         return self.size
-    
+
     def isEmpty(self):
         return self.size == 0
-    
+
     def peek(self):
         if self.isEmpty():
             return None
@@ -132,7 +132,7 @@ class Stack:
         node.next = self.head.next
         self.head.next = node
         self.size += 1
-    
+
     def clear(self):
         self.head.next = None
         self.size = 0
@@ -153,7 +153,7 @@ class Stack:
             self.size += 1
             Deck.pop()
             return True
-        
+
         else:
             return False
 
@@ -166,13 +166,13 @@ class Hand: #// TODO: #5 Create class and linked list Hand
 
     def getLength(self):
         return self.size
-    
+
     def checkUno(self):
         if self.size <= 1:
             return False
         else:
             return "UNO - Letzte Karte!"
-    
+
     def showHand(self):
         temp = 1
         current = self.head.next
@@ -210,12 +210,12 @@ class Hand: #// TODO: #5 Create class and linked list Hand
             return True
         elif newCard.value == stackCard.value:
             return True
-        
+
 
     def playCard(self, stapel:Stack, cardIndex:int): #//TODO #6: play card also removes card from array
         cardToPlay = self.list[int(cardIndex) - 1]
         txtAus.insert(END, "Playing card: ", cardToPlay[0], cardToPlay[1], "\n")
-        
+
         card = Card(cardToPlay[0], cardToPlay[1])
         if self.canPlay(stapel.peek(), card):
             print("Card can be played")
@@ -228,7 +228,7 @@ class Hand: #// TODO: #5 Create class and linked list Hand
             return True
         else:
             return False
-    
+
     def removeCard(self, color:str, value:str): #//TODO #11 remove card also removes card in array
         card = Card(color, value)
         print("inside of removeCard: ", card.color, card.value)
@@ -250,11 +250,11 @@ class Hand: #// TODO: #5 Create class and linked list Hand
                     self.list.remove(cards)
                     print("removed card in array ", card.color, card.value)
                     break
-        
+
         else:
             txtAus.insert(END, "Card not found in hand", "\n")
             return False
-        
+
     def checkAtributes(self, topOfStack): #//Todo #12 Check if any card in hand can be played
         for cards in range(len(self.list)):
             temp = self.list[cards]
@@ -279,7 +279,7 @@ def convertDeck():
 
 def preGame():
     answer = input("Do you wish to play a game?: \n(y/n) ")
-    if answer == "y":  
+    if answer == "y":
         playing = True
         print("Game started")
         return playing
@@ -300,7 +300,7 @@ def turn():
         return  0
     else:
         print("Fehler! Bitte versuchen Sie es erneut.")
-        turn()  
+        turn()
 
 def init():
     pass
@@ -354,7 +354,10 @@ def labelUpdate(topOfStack:Card, label:Label):
         label.config(text="+2")
     elif topOfStack[1] == "Reverse":
         label.config(text="Reverse")
-    
+    else:
+        temp = topOfStack[1]
+        label.config(text=str(temp))
+
 
 
 
@@ -378,7 +381,7 @@ def main(play, turn):
 
     handSpielerEins = Hand() # Hand von Spieler wird erstellt
     handSpielerEins.drawCard(unoDeck, 5) # 5 Karten werden gezogen
-    
+
     handSpielerZwei = Hand() # Hand von Bot wird erstellt
     handSpielerZwei.drawCard(unoDeck, 5) # 5 Karten werden gezogen
 
@@ -410,7 +413,7 @@ def main(play, turn):
                             labelUpdate(stapel.peek(), topCard)
                             if effect == "reverse":
                                 turn = 0
-                            
+
                             elif effect == "Blau":
                                 stapel.changeColor("Blau")
                             elif effect == "Rot":
@@ -432,15 +435,15 @@ def main(play, turn):
                     #//clear
                     txtAus.insert(END, "Du kannst keine Karte Spielen.\n")
                     handSpielerEins.drawCard(unoDeck, 1)
-                    
-                    
+
+
 
 
             elif turn == 1:
                 txtAus.insert(END, "Spieler 2 ist drann:","\n")
                 labelUpdate(stapel.peek(), topCard)
                 drawn = False
-                
+
                 print("debug: \n ist card playable?\n", handSpielerZwei.checkAtributes(stapel.peek()))
                 if handSpielerZwei.checkAtributes(stapel.peek()) == True:
                     #txtAus.insert(END, "Top of the stack: ", stapel.peek(), "\n")
@@ -474,7 +477,7 @@ def main(play, turn):
                         txtAus.insert(END, "du kannst diese karte nicht spielen", "\n")
                 else:
                     txtAus.insert(END, "Du kannst keine Karte Spielen.", "\n")
-                    handSpielerZwei.drawCard(unoDeck, 1)   
+                    handSpielerZwei.drawCard(unoDeck, 1)
     if playing == False:
         if handSpielerEins.size == 0:
             #//clear
@@ -521,8 +524,8 @@ enter.place(x=50, y= 400, width=100, height=50)
 
 
 
-#main(preGame(), turn()) # Hauptfunktion
+main(preGame(), turn()) # Hauptfunktion
 
 
-main(True, 0) # Test aufruf der Hauptfunktion
+#main(True, 0) # Test aufruf der Hauptfunktion
 
